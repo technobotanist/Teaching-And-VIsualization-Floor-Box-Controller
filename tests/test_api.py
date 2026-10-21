@@ -178,7 +178,7 @@ def test_operator_interface_and_assets_are_served() -> None:
     assert page.status_code == 200
     assert "Teaching &amp; Visualization Lab" in page.text
     assert "Projector assignment matrix" in page.text
-    assert "OUT_P1" in page.text
+    assert "1 BLENDED DISPLAY" in page.text
     assert "Apply routing" in page.text
     assert "Show active layout full screen" in page.text
     assert script.status_code == 200
@@ -199,7 +199,7 @@ def test_commissioning_interface_and_assets_are_served() -> None:
     assert page.status_code == 200
     assert "Commissioning Console" in page.text
     assert "Renderer connection" in page.text
-    assert "Projector output map" in page.text
+    assert "Blended display output" in page.text
     assert script.status_code == 200
     assert "confirmAction" in script.text
     assert "loadObsSetup" in script.text

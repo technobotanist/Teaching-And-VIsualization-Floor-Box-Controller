@@ -1,6 +1,8 @@
 # Commissioning
 
-Physical output is disabled in `config/room.json` until this checklist is complete. The repository does not guess monitor indexes or projector overlap.
+Full-screen output is disabled in `config/room.json` until the display server's
+single blended Windows monitor is identified. The repository does not guess its
+monitor index and does not control the display server's physical blend.
 
 Use [ROOM_DEPLOYMENT_RUNBOOK.md](ROOM_DEPLOYMENT_RUNBOOK.md) as the onsite sequence. This file is the technical acceptance checklist used by that runbook.
 
@@ -11,7 +13,8 @@ Open <http://127.0.0.1:8765/commissioning> and select **Start room visit** befor
 During the visit:
 
 1. Record every floor-box label, capture device/channel, signal result, and issue in **Hardware**.
-2. Map one output at a time in **Projector Map**, use **Show ID card** to prove its Windows display, use **Open selected output** to prove its OBS path, then record the physical display observed.
+2. In **Blended Display**, use **Show ID card** to identify the display-server
+   canvas, then use **Open selected output** to prove the OBS Program path.
 3. Use **Mode exercise** in **Acceptance** for repeated switching. **Stop & Blank** is immediate and does not require a confirmation phrase.
 4. Capture a topology snapshot before reboot and another after recovery. Resolve any reported difference before acceptance.
 5. Complete the visit, export the JSON record, and use **Print report** to print or save a PDF with the room change log.
@@ -21,8 +24,9 @@ Starting another visit creates a new record; completed reports remain available 
 ## 1. Prove the hardware path
 
 1. Update both GPU and capture-card drivers to the room-approved versions and record them.
-2. Confirm Windows sees all eight projector displays at the intended refresh rate.
-3. Confirm OBS runs on one selected GPU while both GPUs drive their assigned displays.
+2. Confirm Windows sees the display server as one 11,860 x 1,080 blended monitor
+   at the intended refresh rate.
+3. Confirm OBS runs on the approved GPU and can sustain that panoramic output.
 4. Map all eight floor boxes to `FB_01` through `FB_08` and verify stable 60 FPS capture.
 5. Run a one-hour baseline with all captures active before building the operator layouts.
 
@@ -35,10 +39,11 @@ Create the Profile and Scene Collection from `docs/OBS_SCENE_CONTRACT.md`. Build
 Keep these layers independent:
 
 - Logical scenes decide which floor-box content is visible.
-- `ROUTE_ACTIVE` decides which logical scene is live.
-- `OUT_P1` through `OUT_P8` own measured projector geometry.
+- The selected OBS Program scene decides which logical layout is live.
+- The display server owns measured physical projector geometry and blending.
 
-Do not use the estimated 500-pixel seam overlap as calibration data. Measure every projector's raster, crop, and blend region in the room.
+Do not reproduce the display server's seam overlap or physical calibration in
+OBS. OBS owns only the complete panoramic raster.
 
 ## 3. Enable OBS WebSocket
 
@@ -58,7 +63,7 @@ Automatic configuration refuses to edit OBS files while OBS is running. The gene
 
 Then restart without `-Simulate` and confirm the UI reports `OBS connected`.
 
-## 4. Discover monitor indexes
+## 4. Select the blended display
 
 With OBS and the controller running:
 
@@ -66,25 +71,25 @@ With OBS and the controller running:
 Invoke-RestMethod http://127.0.0.1:8765/api/v1/monitors
 ```
 
-Map each returned index to a physical projector one at a time. Windows monitor indexes are not permanent identifiers; repeat this step after GPU, driver, cable, or display-topology changes.
+Use **Show ID card** in the Commissioning Console to identify the one Windows
+monitor exposed by the display server. Windows monitor indexes are not permanent;
+repeat this after GPU, driver, cable, or display-topology changes.
 
-For each projector in `config/room.json`:
-
-1. Enter the verified `monitor_index`.
-2. Set `enabled` to `true` only after its `OUT_Pn` scene is calibrated.
-3. Leave `auto_open` as `false` until all enabled outputs are correct.
-4. Use `POST /api/v1/outputs/open` to test the commissioned set.
-
-When the complete set is stable, set `auto_open` to `true` so the first room-mode command restores the projector windows after startup.
+1. Assign that index to **Blended display**.
+2. Enable it after verifying the ID card appears on the panoramic canvas.
+3. Use **Open selected output** to test one full-screen OBS Program window.
+4. Leave `auto_open` as `false` until the target is confirmed; enable it later
+   only if automatic room startup is desired.
 
 ## 5. Acceptance test
 
-Run at least one continuous hour while all eight captures and all eight projector windows are active.
+Run at least one continuous hour while all eight captures and the one panoramic
+Program window are active on the blended display.
 
 - Switch through Wraparound, all four Lecture variants, Multi-source, Custom, and Blank at least 25 times each.
 - Confirm no editor window appears on a projector.
 - Confirm no route reveals the prior mode or an unfilled canvas region.
-- Confirm crop, mask, and warp values do not change while switching.
+- Confirm the display-server blend remains aligned while switching.
 - Confirm no missed or skipped frames in OBS Stats.
 - Power-cycle the workstation and verify startup, shortcuts, and output restoration.
 - Disconnect and reconnect one noncritical input and verify the room recovers predictably.

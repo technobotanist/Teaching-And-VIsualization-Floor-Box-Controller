@@ -236,7 +236,7 @@ class ObsWebSocketGateway:
                     )
         except Exception as error:
             self._reset()
-            raise ObsGatewayError("Could not open the commissioned projector outputs") from error
+            raise ObsGatewayError("Could not open the commissioned display output") from error
 
     def monitor_names(self) -> list[str]:
         try:
@@ -349,9 +349,7 @@ class SimulatedObsGateway:
             "07_LECTURE_DOUBLE",
             "08_LECTURE_SINGLE_BACKGROUND",
             "09_LECTURE_DOUBLE_BACKGROUND",
-            "ROUTE_ACTIVE",
             *CUSTOM_SLOT_SCENE_NAMES,
-            *(f"OUT_P{number}" for number in range(1, 9)),
         ]
         return ObsCommissioningData(
             simulation=True,

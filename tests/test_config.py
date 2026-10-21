@@ -27,6 +27,9 @@ def test_production_config_is_valid() -> None:
     assert config.custom_routing.assignments == {
         f"p{number}": f"FB_{number:02d}" for number in range(1, 9)
     }
+    assert config.outputs.topology == "single-program"
+    assert len(config.outputs.projectors) == 1
+    assert config.outputs.projectors[0].kind == "program"
     assert not any(projector.enabled for projector in config.outputs.projectors)
 
 
@@ -49,12 +52,26 @@ def test_enabled_projector_requires_verified_monitor_index() -> None:
 def test_enabled_source_projectors_require_shared_router_scene() -> None:
     raw_config = json.loads(CONFIG_PATH.read_text(encoding="utf-8"))
     projector = raw_config["outputs"]["projectors"][0]
+    projector["kind"] = "source"
+    projector["source_name"] = "OUT_P1"
     projector["enabled"] = True
     projector["monitor_index"] = 1
     raw_config["outputs"]["router_scene"] = None
 
     with pytest.raises(ValidationError, match="router_scene is required"):
         ControllerConfig.model_validate(raw_config)
+
+
+def test_program_output_does_not_require_router_scene() -> None:
+    raw_config = json.loads(CONFIG_PATH.read_text(encoding="utf-8"))
+    projector = raw_config["outputs"]["projectors"][0]
+    projector["enabled"] = True
+    projector["monitor_index"] = 1
+
+    config = ControllerConfig.model_validate(raw_config)
+
+    assert config.outputs.router_scene is None
+    assert config.outputs.projectors[0].kind == "program"
 
 
 def test_custom_routing_requires_all_projector_slots() -> None:

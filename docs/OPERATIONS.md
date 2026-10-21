@@ -13,8 +13,8 @@ desktop shortcut. See the [first-launch requirements](../README.md#install-and-p
 3. Open the `T&V HDMI Floor Box Controller` desktop shortcut.
 4. Confirm the top-right status reads `OBS connected` and the commissioned count is correct.
 5. Select the required room mode.
-6. Select **Show [layout] full screen** to open that layout on every commissioned
-   projector display. For all eight floor boxes, select **Multi-source**, then
+6. Select **Show [layout] full screen** to open the complete panoramic Program
+   canvas on the blended display. For all eight floor boxes, select **Multi-source**, then
    **Show Multi-source full screen**.
 
 The controller shortcut starts both the local API and browser UI; no separate
@@ -23,11 +23,11 @@ Launching the same controller again reopens the browser rather than starting a
 second server. To stop the controller or switch simulation settings, restore its
 server window and press **Ctrl+C** before launching again. OBS is started separately.
 
-The full-screen button opens the locked OBS `OUT_Pn` source-projector windows on
-their commissioned Windows displays. It is disabled until at least one projector
-has been assigned a monitor index and enabled in the Commissioning Console.
+The full-screen button opens one OBS Program projector on the display server's
+commissioned blended Windows monitor. Before that monitor is configured, the
+button reads **Choose blended display** and opens the relevant Commissioning tab.
 The full-screen icon in the page header only expands the browser controller; it
-does not send video to the projector array.
+does not send video to the blended display.
 
 ## Mode map
 
@@ -54,7 +54,10 @@ Custom Routing uses the locked slot scenes in OBS Scene Collection `T&V Producti
 4. Select **Apply routing**. The assignments are saved and `05_CUSTOM` becomes live.
 5. Use **Blank array** to hide the array without changing the saved assignments.
 
-Do not edit `CUSTOM_SLOT_P1` through `CUSTOM_SLOT_P8`, `ROUTE_ACTIVE`, or `OUT_P1` through `OUT_P8` during normal operation. Those scenes contain locked logical placement, switching, and projector calibration.
+Do not edit `CUSTOM_SLOT_P1` through `CUSTOM_SLOT_P8` during normal operation.
+They contain the locked logical regions that align with the eight apparent
+projector positions inside the blended canvas. Physical blending is owned by the
+display server, not these OBS scenes.
 
 ## Stream Deck and desktop commands
 
@@ -75,7 +78,7 @@ To regenerate them manually (for example after moving the repository), run:
 
 ## Recovery
 
-Use `Blank` first if incorrect content is visible. A mode-selection failure does not modify projector calibration.
+Use `Blank` first if incorrect content is visible. A mode-selection failure does not modify display-server calibration.
 
 Create a known-good backup after every approved OBS or controller change:
 

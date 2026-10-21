@@ -18,6 +18,7 @@ const elements = {
   modeGrid: document.querySelector("#mode-grid"),
   openOutputs: document.querySelector("#open-outputs-button"),
   outputCount: document.querySelector("#output-count"),
+  outputLabel: document.querySelector("#output-label"),
   outputState: document.querySelector("#output-state"),
   refresh: document.querySelector("#refresh-button"),
   roomName: document.querySelector("#room-name"),
@@ -134,6 +135,7 @@ function renderConfig() {
   elements.siteName.textContent = room.site;
   elements.canvas.textContent = `${room.canvas_width.toLocaleString()} × ${room.canvas_height.toLocaleString()}`;
   elements.fps.textContent = `${room.fps} FPS`;
+  elements.outputLabel.textContent = state.config.outputs.label.toUpperCase();
   renderModes();
 }
 
@@ -148,26 +150,31 @@ function renderStatus() {
   elements.connectionLabel.textContent = state.status.obs.message;
   elements.activeScene.textContent = state.status.obs.current_scene || "No active scene";
 
-  const totalOutputs = state.config?.outputs.projector_count || 8;
+  const singleBlendedDisplay = state.config?.outputs.topology === "single-program";
+  const totalOutputs = state.config?.outputs.projector_count || 1;
   const commissioned = state.status.commissioned_output_count;
   const activeMode = state.config?.modes.find(
     (mode) => mode.id === state.status.active_mode_id,
   );
   const activeLayout = activeMode?.label || "active layout";
-  elements.outputCount.textContent = `${commissioned} of ${totalOutputs}`;
+  elements.outputCount.textContent = singleBlendedDisplay
+    ? commissioned > 0 ? "Configured" : "Not configured"
+    : `${commissioned} of ${totalOutputs}`;
   elements.outputState.textContent = state.status.outputs_opened
     ? `${activeLayout} full screen`
     : commissioned > 0
       ? "Ready for full screen"
-      : "Outputs locked";
+      : "Select the blended Windows display";
 
-  elements.openOutputs.disabled = state.busy || !connected || commissioned === 0;
+  elements.openOutputs.disabled = state.busy || !connected;
   elements.openOutputs.title = commissioned === 0
-    ? "Commission at least one projector display before presenting full screen"
-    : `Open ${activeLayout} full screen on the commissioned projector displays`;
-  elements.openOutputs.textContent = state.status.outputs_opened
-    ? `Reopen ${activeLayout} full screen`
-    : `Show ${activeLayout} full screen`;
+    ? "Choose the blended Windows display used by the display server"
+    : `Open ${activeLayout} full screen on the blended display`;
+  elements.openOutputs.textContent = commissioned === 0
+    ? "Choose blended display"
+    : state.status.outputs_opened
+      ? `Reopen ${activeLayout} full screen`
+      : `Show ${activeLayout} full screen`;
 
   const customIsActive = state.status.active_mode_id === "custom";
   elements.customLiveState.textContent = customIsActive
@@ -341,6 +348,10 @@ async function openOutputs() {
   if (state.busy) {
     return;
   }
+  if (state.status.commissioned_output_count === 0) {
+    window.location.assign("/commissioning#projectors");
+    return;
+  }
   setBusy(true);
   try {
     state.status = await request("/api/v1/outputs/open", { method: "POST" });
@@ -348,7 +359,7 @@ async function openOutputs() {
     const activeMode = state.config?.modes.find(
       (mode) => mode.id === state.status.active_mode_id,
     );
-    showToast(`${activeMode?.label || "Active layout"} is full screen on the projector outputs`);
+    showToast(`${activeMode?.label || "Active layout"} is full screen on the blended display`);
   } catch (error) {
     showToast(error.message);
   } finally {

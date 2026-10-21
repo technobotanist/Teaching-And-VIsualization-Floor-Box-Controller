@@ -1,6 +1,8 @@
 # Architecture
 
-The T&V HDMI Floor Box Controller is a localhost appliance around OBS Studio. OBS owns capture, composition, calibration, and projector windows. The controller owns the operator workflow and is the only supported automation boundary.
+The T&V HDMI Floor Box Controller is a localhost appliance around OBS Studio.
+OBS owns capture and composition, the display server owns physical blending, and
+the controller owns the operator workflow and full-screen Program window.
 
 ```mermaid
 flowchart LR
@@ -9,13 +11,10 @@ flowchart LR
     Browser[Operator UI] --> API
     Panel[Future wall panel] -.-> API
     API --> WS[OBS WebSocket]
-    WS --> Router[ROUTE_ACTIVE]
-    Router --> O1[OUT_P1]
-    Router --> O2[OUT_P2]
-    Router --> O8[OUT_P8]
-    O1 --> P1[Projector 1]
-    O2 --> P2[Projector 2]
-    O8 --> P8[Projector 8]
+    WS --> Program[OBS Program scene]
+    Program --> Canvas[Full-screen 11860x1080 window]
+    Canvas --> Blend[Display-server blended monitor]
+    Blend --> Array[Physical projector array]
 ```
 
 ## State ownership
@@ -24,18 +23,22 @@ flowchart LR
 | --- | --- |
 | Capture-device identity and floor-box mapping | OBS source pool |
 | Wraparound, lecture, multi-source, blank, and custom content | Logical OBS scenes |
-| Active logical mode | `ROUTE_ACTIVE` scene-item visibility |
-| Crop, scale, overlap, mask, warp, and projector assignment | `OUT_P1` through `OUT_P8` |
+| Active logical mode | OBS Program scene |
+| Physical crop, overlap, mask, warp, and projector alignment | Display-server blend configuration |
+| Full-screen Windows target | Controller output configuration |
 | Operator access and automation | Local controller |
 | Known-good recovery | Backup/restore scripts and secured shared storage |
 
-## Why `ROUTE_ACTIVE` exists
+## Single blended output
 
-An OBS source projector for `OUT_P1` does not follow whichever scene happens to be Program. Every `OUT_Pn` scene therefore nests the same `ROUTE_ACTIVE` scene. `ROUTE_ACTIVE` contains all six logical scenes, with exactly one enabled.
+Windows sees the display server as one panoramic monitor. OBS renders one
+11,860 x 1,080 Program canvas and opens one full-screen Program projector on
+that monitor. Selecting a room mode changes the OBS Program scene; the
+full-screen window follows it automatically.
 
-The controller normalizes all route visibility on its first commissioned mode activation. Later changes enable the next full-canvas route before disabling the prior route. Projector geometry is never edited during this operation.
-
-All routed scenes must be opaque across the full 11,860 x 1,080 canvas. That invariant prevents a one-frame reveal of the previous route while switching.
+The Multi-source scene divides that single canvas into eight logical regions
+aligned with the physical projector positions. The display server—not OBS and
+not this controller—owns the underlying projector seam and blend geometry.
 
 ## Local API
 
@@ -47,7 +50,7 @@ The service listens on `127.0.0.1:8765` by default.
 | `GET` | `/api/v1/config` | Public room and mode metadata |
 | `GET` | `/api/v1/status` | OBS, scene, and output status |
 | `POST` | `/api/v1/modes/{id}/activate` | Activate a room mode |
-| `POST` | `/api/v1/outputs/open` | Open commissioned projector windows |
+| `POST` | `/api/v1/outputs/open` | Open OBS Program full-screen on the blended display |
 | `POST` | `/api/v1/editor/focus` | Restore and focus the OBS editor for the Custom workspace |
 | `GET` | `/api/v1/obs/setup` | Inspect installation, process, WebSocket, and authentication readiness |
 | `POST` | `/api/v1/obs/setup/launch` | Launch or focus the installed OBS instance |
@@ -56,12 +59,15 @@ The service listens on `127.0.0.1:8765` by default.
 | `GET` | `/api/v1/monitors` | Read OBS's current Windows monitor list |
 | `GET` | `/api/v1/commissioning` | Normalized system, OBS-contract, stats, monitor, and output readiness |
 | `POST` | `/api/v1/commissioning/inventory/refresh` | Refresh the read-only Windows hardware inventory |
-| `PUT` | `/api/v1/commissioning/projectors/{id}` | Persist a confirmed monitor assignment and enabled state |
-| `POST` | `/api/v1/commissioning/projectors/{id}/test` | Open one confirmed output for physical identification |
+| `PUT` | `/api/v1/commissioning/projectors/{id}` | Persist the blended-monitor assignment and enabled state |
+| `POST` | `/api/v1/commissioning/projectors/{id}/test` | Test OBS Program on the blended monitor |
 
 The API is intentionally bound to loopback. A future wall-panel bridge should authenticate at its own boundary and relay only the small command set above.
 
-Custom Routing assigns one `FB_01` through `FB_08` source, or black, to each `CUSTOM_SLOT_P1` through `CUSTOM_SLOT_P8` scene. The browser changes scene-item visibility only. Slot transforms remain locked in OBS, and the controller has no mutation access to calibrated `OUT_Pn` transforms or filters.
+Custom Routing assigns one `FB_01` through `FB_08` source, or black, to each
+`CUSTOM_SLOT_P1` through `CUSTOM_SLOT_P8` logical region. The browser changes
+scene-item visibility only. Slot transforms remain locked in OBS, and the
+controller has no access to the display server's physical blend.
 
 The commissioning API intentionally has no scene-transform, crop, filter, mask, or warp mutation endpoint. Those measured values remain locked in OBS output scenes. Monitor-map and test calls require explicit `MAP Pn` or `TEST Pn` confirmation phrases.
 

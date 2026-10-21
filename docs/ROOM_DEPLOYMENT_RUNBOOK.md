@@ -1,6 +1,8 @@
 # Room Deployment Runbook
 
-This is the path from the working simulation to a production room. Do not begin by enabling all eight outputs. Commission one layer at a time and keep `Blank` available throughout.
+This is the path from the working simulation to a production room. Commission
+the single blended display path one layer at a time and keep `Blank` available
+throughout.
 
 ## What exists today
 
@@ -15,13 +17,14 @@ Already built and testable:
 Still requiring work in the physical room:
 
 - Map the two capture cards to floor boxes 1-8.
-- Prove that Windows and OBS can sustain all eight projector displays across two GPUs.
+- Prove that Windows and OBS can sustain the display server's one panoramic blended monitor.
 - Build the production OBS sources and scenes.
-- Measure and calibrate each projector output.
-- Map OBS monitor indexes to physical projectors.
+- Verify the display server's existing physical projector blend.
+- Map the one OBS Program projector to the blended Windows monitor.
 - Configure Windows startup, Stream Deck, recovery storage, and staff acceptance.
 
-The repository cannot supply the last six items because they depend on the installed cards, drivers, cabling, displays, and measured projector overlap.
+The repository cannot supply the hardware mappings or physical blend because
+they depend on the installed cards, drivers, cabling, and display server.
 
 ## People and access
 
@@ -73,16 +76,9 @@ Complete this table during the visit:
 
 Record the output path separately:
 
-| Projector | Physical label | GPU | GPU port | Windows display | Native mode | OBS monitor index |
-| --- | --- | --- | --- | --- | --- | --- |
-| P1 |  |  |  |  |  |  |
-| P2 |  |  |  |  |  |  |
-| P3 |  |  |  |  |  |  |
-| P4 |  |  |  |  |  |  |
-| P5 |  |  |  |  |  |  |
-| P6 |  |  |  |  |  |  |
-| P7 |  |  |  |  |  |  |
-| P8 |  |  |  |  |  |  |
+| Output | Display-server connection | Windows display | Resolution | OBS monitor index |
+| --- | --- | --- | --- | --- |
+| Blended canvas |  |  | `11860 x 1080` |  |
 
 ### Prove the inputs
 
@@ -95,15 +91,16 @@ Record the output path separately:
 
 ### Prove the outputs
 
-1. Confirm Windows Extended Desktop exposes eight independent projector displays.
-2. Use Windows **Identify** and a physical observer to fill in the output table.
-3. Confirm every projector runs at its intended native resolution and refresh rate.
-4. Start OBS on the chosen render GPU while both GPUs continue driving their displays.
-5. Open temporary OBS projectors one at a time and confirm the two-GPU output path remains stable.
+1. Confirm Windows Extended Desktop exposes the display server as one panoramic monitor.
+2. Use Windows **Identify** and the Commissioning Console ID card to fill in the output table.
+3. Confirm the blended monitor runs at `11860 x 1080` and the intended refresh rate.
+4. Start OBS on the chosen render GPU.
+5. Open one temporary OBS Program projector and confirm it fills the blended canvas.
 
 ### Gate 1
 
-Proceed only if all eight inputs remain live and all eight outputs remain connected for one hour without unacceptable OBS rendering lag. If this gate fails, stop controller work and resolve the Windows, driver, GPU, capture, or cabling problem first.
+Proceed only if all eight inputs remain live and the blended output remains
+connected for one hour without unacceptable OBS rendering lag.
 
 **Deliverable:** Completed input/output maps, hardware/driver inventory, OBS Stats results, and a written choice of OBS render GPU.
 
@@ -120,13 +117,13 @@ Estimated room time: 3-6 hours.
 5. Build `04_WRAPAROUND` and verify `SERVER_DESKTOP` spans the panoramic canvas.
 6. Build the four `06_` through `09_` Lecture scenes and verify they use only `FB_04`, `FB_05`, black, and `SERVER_DESKTOP` as specified.
 7. Build `CUSTOM_SLOT_P1` through `CUSTOM_SLOT_P8`, lock every source transform, then nest all slots over black in `05_CUSTOM`.
-8. Add all eight numbered logical scenes to `ROUTE_ACTIVE`, reset their transforms, and leave only `00_BLACK` enabled.
-9. Enable OBS WebSocket on port `4455` with authentication.
-10. Set `OBS_WEBSOCKET_PASSWORD` for the Windows account that will launch the controller.
-11. Start the controller without `-Simulate` and open the Commissioning Console's **OBS Contract** tab.
-12. Resolve every failed automated check, then verify mode buttons and Custom assignments change the expected visibility in OBS.
+8. Enable OBS WebSocket on port `4455` with authentication.
+9. Set `OBS_WEBSOCKET_PASSWORD` for the Windows account that will launch the controller.
+10. Start the controller without `-Simulate` and open the Commissioning Console's **OBS Contract** tab.
+11. Resolve every failed automated check, then verify mode buttons and Custom assignments change the OBS Program scene as expected.
 
-At this point, switching should work inside OBS even though no production projector outputs are enabled in `config/room.json`.
+At this point, switching should work inside OBS even though the blended Windows
+display is not yet enabled in `config/room.json`.
 
 ### Gate 2
 
@@ -134,25 +131,24 @@ Proceed only if all seven operating modes plus Blank switch correctly in OBS Pre
 
 **Deliverable:** Working production Profile and Scene Collection with controller-driven logical switching.
 
-## Session 3: Calibrate one projector, then eight
+## Session 3: Commission the blended display
 
-**Goal:** Establish the permanent physical output layer without letting mode changes alter geometry.
+**Goal:** Establish the one permanent full-screen output while leaving physical
+projector geometry in the display server.
 
 Estimated room time: 4-8 hours, depending on the existing blend/mask process.
 
-1. Put a full-canvas alignment grid into `ROUTE_ACTIVE` or a temporary calibration scene.
-2. Build `OUT_P1` with `ROUTE_ACTIVE` nested inside it.
-3. Apply only P1's measured crop, scale, position, mask, and correction in `OUT_P1`.
-4. Lock the calibrated items.
-5. Open `OUT_P1` as an OBS source projector on physical projector 1.
-6. Switch through all room modes. P1 geometry must remain stationary.
-7. Repeat for `OUT_P2` through `OUT_P8`, calibrating seams in physical order.
+1. Put a full-canvas alignment grid into a temporary OBS scene.
+2. Verify the display server maps that one raster across all physical projectors.
+3. Complete seam, warp, mask, and blend adjustments in the display server.
+4. Open the Commissioning Console's **Blended Display** tab.
+5. Select the verified panoramic Windows monitor, confirm `MAP P1`, and enable it.
+6. Use `TEST P1` to open OBS Program full-screen on that monitor.
+7. Switch through every room mode and confirm the display-server geometry remains stationary.
 
-Do not use the estimated 500-pixel overlap as a calibration value. Record the actual crop and blend region at every seam.
-
-After the scenes are calibrated, open the Commissioning Console's **Projector Map** tab. For each output, select the verified Windows display, type the requested `MAP Pn` confirmation, save it, then use `TEST Pn` to open only that output.
-
-For each assignment, use **Show ID card** to verify the Windows display location, then **Open selected output** to verify the OBS `OUT_Pn` path. Record the physical display observed and mark it Correct, Wrong projector, or No signal. Do not mark the output map gate complete until all eight observed results pass.
+Use **Show ID card** to verify the Windows display location, then **Open selected
+output** to verify the OBS Program path. Record the blended display observed and
+mark it Correct, Wrong display, or No signal.
 
 The monitor list remains available from PowerShell for troubleshooting:
 
@@ -160,15 +156,20 @@ The monitor list remains available from PowerShell for troubleshooting:
 Invoke-RestMethod http://127.0.0.1:8765/api/v1/monitors
 ```
 
-The console writes `monitor_index` and `enabled` atomically to `config/room.json`; duplicate monitor assignments are rejected. If a source opens on the wrong display, disable that entry and correct the physical map before proceeding.
+The console writes `monitor_index` and `enabled` atomically to `config/room.json`.
+If Program opens on the wrong display, disable the entry and correct the target
+before proceeding.
 
-Only after all eight outputs are correct should `auto_open` be changed to `true`.
+Only after the blended output is correct should `auto_open` be changed to `true`.
 
 ### Gate 3
 
-Proceed only if every `OUT_Pn` opens on the intended projector, all seams remain calibrated across every room mode, and no OBS editor or control window appears on the array.
+Proceed only if OBS Program fills the intended blended display, all physical
+seams remain calibrated across every room mode, and no OBS editor or controller
+window appears on the array.
 
-**Deliverable:** Eight locked output scenes, measured calibration notes, and a verified `config/room.json` monitor map.
+**Deliverable:** Verified blended-display calibration notes and a confirmed
+`config/room.json` monitor target.
 
 ## Session 4: Productionize and hand off
 
@@ -203,7 +204,8 @@ Schedule Session 1 and open the Commissioning Console on the actual room server.
 
 1. Capture-card manufacturer and model numbers.
 2. GPU manufacturer and model numbers.
-3. Projector model and current Windows display topology.
+3. Display-server model and current Windows display topology.
 4. Whether the room server already has OBS 28 or newer and Python 3.11 or newer.
 
-Do not enter monitor indexes or enable projector entries yet. The first implementation decision depends on whether the eight-display, two-GPU path passes Gate 1.
+Do not enter a monitor index or enable the blended output until the panoramic
+Windows display has been positively identified.

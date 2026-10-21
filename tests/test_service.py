@@ -53,21 +53,18 @@ def test_unknown_mode_does_not_change_obs() -> None:
     assert gateway.scene_changes == []
 
 
-def test_commissioned_outputs_route_without_changing_projector_geometry() -> None:
+def test_blended_program_output_follows_active_scene() -> None:
     raw_config = json.loads(CONFIG_PATH.read_text(encoding="utf-8"))
-    for monitor_index, projector in enumerate(raw_config["outputs"]["projectors"], start=1):
-        projector["monitor_index"] = monitor_index
-        projector["enabled"] = True
+    projector = raw_config["outputs"]["projectors"][0]
+    projector["monitor_index"] = 1
+    projector["enabled"] = True
     config = ControllerConfig.model_validate(raw_config)
     gateway = SimulatedObsGateway()
     controller = DisplayController(config, gateway)
 
     controller.activate("multi-source")
+    controller.open_outputs()
 
-    assert gateway.routing_requests == [
-        (
-            "01_EIGHT_SOURCE",
-            ("ROUTE_ACTIVE",),
-        )
-    ]
-    assert gateway.opened_projectors == []
+    assert gateway.current_scene == "01_EIGHT_SOURCE"
+    assert gateway.routing_requests == []
+    assert gateway.opened_projectors == ["p1"]

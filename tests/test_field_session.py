@@ -50,6 +50,7 @@ def test_field_session_api_survives_app_restart(tmp_path: Path) -> None:
         )
     )
     session = client.post("/api/v1/field-session").json()
+    assert list(session["projector_tests"]) == ["p1"]
 
     input_response = client.put(
         f"/api/v1/field-session/{session['id']}/inputs/FB_01",

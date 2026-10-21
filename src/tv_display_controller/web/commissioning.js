@@ -93,7 +93,7 @@ const elements = {
 const phaseMetadata = {
   hardware: ["PHASE 01", "Hardware inventory"],
   "obs-contract": ["PHASE 02", "OBS display engine"],
-  projectors: ["PHASE 03", "Projector output map"],
+  projectors: ["PHASE 03", "Blended display output"],
   acceptance: ["PHASE 04", "Production acceptance"],
 };
 
@@ -459,6 +459,8 @@ function renderProjectors() {
   elements.projectorRows.replaceChildren();
   elements.commissionedCount.textContent = String(state.snapshot.commissioned_count);
   const monitors = state.snapshot.obs.monitors || [];
+  const targetCount = state.snapshot.projectors.length;
+  document.querySelector("#output-target-count").textContent = String(targetCount);
 
   state.snapshot.projectors.forEach((projector) => {
     const row = document.createElement("div");
@@ -468,7 +470,8 @@ function renderProjectors() {
     const label = document.createElement("strong");
     label.textContent = projector.label;
     const source = document.createElement("span");
-    source.textContent = projector.source_name;
+    const outputName = projector.kind === "program" ? "OBS Program" : projector.source_name;
+    source.textContent = outputName;
 
     const select = document.createElement("select");
     select.setAttribute("aria-label", `${projector.label} Windows display`);
@@ -504,7 +507,7 @@ function renderProjectors() {
         title: `Save ${projector.label} map`,
         detail: monitorIndex == null
           ? `Clear the Windows display assignment for ${projector.label}.`
-          : `Assign ${projector.source_name} to OBS monitor index ${monitorIndex}${enabled.checked ? " and enable it" : ""}.`,
+          : `Assign ${outputName} to OBS monitor index ${monitorIndex}${enabled.checked ? " and enable it" : ""}.`,
         run: () => request(`/api/v1/commissioning/projectors/${projector.id}`, {
           method: "PUT",
           body: JSON.stringify({ monitor_index: monitorIndex, enabled: enabled.checked, confirmation: `MAP ${projector.id.toUpperCase()}` }),
@@ -517,7 +520,7 @@ function renderProjectors() {
       () => confirmAction({
         phrase: `TEST ${projector.id.toUpperCase()}`,
         title: `Open ${projector.label} test`,
-        detail: `Open ${projector.source_name} full-screen on its saved Windows display. This can cover content currently visible on that display.`,
+        detail: `Open ${outputName} full-screen on its saved Windows display. This can cover content currently visible on that display.`,
         run: () => request(`/api/v1/commissioning/projectors/${projector.id}/test`, {
           method: "POST",
           body: JSON.stringify({ confirmation: `TEST ${projector.id.toUpperCase()}` }),
@@ -541,7 +544,7 @@ function renderProjectorTest() {
   projectors.forEach((projector, index) => {
     const option = document.createElement("option");
     option.value = projector.id;
-    option.textContent = `${projector.label} · ${projector.source_name}`;
+    option.textContent = `${projector.label} · ${projector.kind === "program" ? "OBS Program" : projector.source_name}`;
     option.selected = projector.id === selectedId;
     elements.projectorTestTarget.append(option);
     if (option.selected) state.projectorIndex = index;
@@ -549,7 +552,7 @@ function renderProjectorTest() {
   const projector = projectors[state.projectorIndex];
   const result = projector ? results[projector.id] || {} : {};
   const passed = Object.values(results).filter((item) => item.status === "pass").length;
-  elements.projectorTestProgress.textContent = `${passed} / ${projectors.length || 8} passed`;
+  elements.projectorTestProgress.textContent = `${passed} / ${projectors.length || 1} passed`;
   elements.projectorTestExpected.textContent = projector?.monitor_index == null
     ? "Assign a Windows display below first"
     : `Expected OBS monitor index ${projector.monitor_index}`;
@@ -570,7 +573,7 @@ function openSelectedProjectorTest() {
   confirmAction({
     phrase: `TEST ${projector.id.toUpperCase()}`,
     title: `Open ${projector.label} test`,
-    detail: `Open ${projector.source_name} full-screen on OBS monitor index ${projector.monitor_index}. Observe which physical projector displays it.`,
+    detail: `Open ${projector.kind === "program" ? "OBS Program" : projector.source_name} full-screen on OBS monitor index ${projector.monitor_index}. Confirm that it fills the blended display.`,
     run: () => request(`/api/v1/commissioning/projectors/${projector.id}/test`, {
       method: "POST",
       body: JSON.stringify({ confirmation: `TEST ${projector.id.toUpperCase()}` }),

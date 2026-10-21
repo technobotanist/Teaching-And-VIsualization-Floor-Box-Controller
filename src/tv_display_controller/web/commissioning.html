@@ -28,7 +28,7 @@
           <div>
             <p class="site-name">ADMIN WORKSPACE</p>
             <h1>Commissioning Console</h1>
-            <p class="product-name">Hardware → OBS → Projector Array</p>
+            <p class="product-name">Hardware → OBS → Blended Display</p>
           </div>
         </div>
         <div class="commission-state" id="commission-state" role="status" aria-live="polite">
@@ -64,7 +64,7 @@
             <span>02</span><strong>OBS Contract</strong><small>Profile, scenes, inputs</small>
           </button>
           <button class="step-tab" type="button" data-panel-target="projectors">
-            <span>03</span><strong>Projector Map</strong><small>Displays and output tests</small>
+            <span>03</span><strong>Blended Display</strong><small>Full-screen Program target</small>
           </button>
           <button class="step-tab" type="button" data-panel-target="acceptance">
             <span>04</span><strong>Acceptance</strong><small>Soak, recovery, handoff</small>
@@ -226,25 +226,25 @@
           <section class="commission-panel" data-panel="projectors" aria-labelledby="projector-heading" hidden>
             <div class="panel-heading">
               <div>
-                <h3 id="projector-heading">Projector output map</h3>
-                <p>Assign and test one physical display at a time. Geometry remains locked in OBS.</p>
+                <h3 id="projector-heading">Blended display output</h3>
+                <p>Choose the one Windows display presented by the display server as the full panoramic canvas.</p>
               </div>
-              <div class="count-badge"><strong id="commissioned-count">0</strong> / 8 enabled</div>
+              <div class="count-badge"><strong id="commissioned-count">0</strong> / <span id="output-target-count">1</span> enabled</div>
             </div>
 
             <div class="safety-notice">
               <strong>Room-impacting controls</strong>
-              <span>Saving changes writes the room configuration. Testing opens an OBS source projector on the selected display.</span>
+              <span>Saving changes writes the room configuration. Testing opens the OBS Program canvas full-screen on the selected blended display.</span>
             </div>
 
             <section class="field-tool projector-identifier" aria-labelledby="projector-identifier-heading">
               <div class="field-tool-heading">
                 <div>
-                  <span class="setup-number">ONE AT A TIME</span>
-                  <h4 id="projector-identifier-heading">Physical projector identification</h4>
-                  <p>Open one saved output, observe the room, and record where it appeared.</p>
+                  <span class="setup-number">ONE DISPLAY TARGET</span>
+                  <h4 id="projector-identifier-heading">Blended display identification</h4>
+                  <p>Identify the display-server canvas, then open OBS Program full-screen on it.</p>
                 </div>
-                <strong id="projector-test-progress">0 / 8 passed</strong>
+                <strong id="projector-test-progress">0 / 1 passed</strong>
               </div>
               <div class="projector-test-console">
                 <div class="projector-test-target">
@@ -257,16 +257,16 @@
                   <button class="primary-button" id="open-projector-test" type="button">Open selected output</button>
                 </div>
                 <label><span>OBSERVED DISPLAY / ROOM LABEL</span><input id="projector-observed-display" type="text" maxlength="240" placeholder="North wall, second from left"></label>
-                <label><span>RESULT</span><select id="projector-test-status"><option value="untested">Untested</option><option value="pass">Correct projector</option><option value="wrong_display">Wrong projector</option><option value="no_signal">No signal</option></select></label>
+                <label><span>RESULT</span><select id="projector-test-status"><option value="untested">Untested</option><option value="pass">Correct blended display</option><option value="wrong_display">Wrong display</option><option value="no_signal">No signal</option></select></label>
                 <label class="projector-test-notes"><span>NOTES</span><input id="projector-test-notes" type="text" maxlength="1000" placeholder="Unexpected display, cable, or image issue"></label>
                 <button class="secondary-button" id="save-projector-result" type="button">Save result &amp; next</button>
               </div>
             </section>
 
-            <div class="projector-table" role="table" aria-label="Projector monitor assignments">
+            <div class="projector-table" role="table" aria-label="Blended display monitor assignment">
               <div class="projector-row projector-table-head" role="row">
                 <span role="columnheader">Output</span>
-                <span role="columnheader">OBS source</span>
+                <span role="columnheader">OBS output</span>
                 <span role="columnheader">Windows display</span>
                 <span role="columnheader">Enabled</span>
                 <span role="columnheader">Actions</span>
@@ -276,8 +276,8 @@
 
             <div class="manual-gate">
               <div><span class="gate-number">GATE 3</span><strong>Calibration verification</strong></div>
-              <label><input type="checkbox" data-check="geometry-locked"> All OUT_P1-OUT_P8 geometry and mask items are locked</label>
-              <label><input type="checkbox" data-check="seams-verified"> Every seam remains aligned in all seven room modes</label>
+              <label><input type="checkbox" data-check="geometry-locked"> Display-server blend and canvas geometry are locked</label>
+              <label><input type="checkbox" data-check="seams-verified"> Every projected seam remains aligned in all seven room modes</label>
               <label><input type="checkbox" data-check="no-editor-output"> No OBS editor or controller window appears on the array</label>
             </div>
           </section>

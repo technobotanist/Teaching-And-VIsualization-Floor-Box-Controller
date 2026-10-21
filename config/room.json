@@ -17,71 +17,15 @@
     "timeout_seconds": 3.0
   },
   "outputs": {
-    "topology": "eight-source-projectors",
-    "router_scene": "ROUTE_ACTIVE",
+    "topology": "single-program",
+    "router_scene": null,
     "auto_open": false,
     "projectors": [
       {
         "id": "p1",
-        "label": "Projector 1",
-        "kind": "source",
-        "source_name": "OUT_P1",
-        "monitor_index": null,
-        "enabled": false
-      },
-      {
-        "id": "p2",
-        "label": "Projector 2",
-        "kind": "source",
-        "source_name": "OUT_P2",
-        "monitor_index": null,
-        "enabled": false
-      },
-      {
-        "id": "p3",
-        "label": "Projector 3",
-        "kind": "source",
-        "source_name": "OUT_P3",
-        "monitor_index": null,
-        "enabled": false
-      },
-      {
-        "id": "p4",
-        "label": "Projector 4",
-        "kind": "source",
-        "source_name": "OUT_P4",
-        "monitor_index": null,
-        "enabled": false
-      },
-      {
-        "id": "p5",
-        "label": "Projector 5",
-        "kind": "source",
-        "source_name": "OUT_P5",
-        "monitor_index": null,
-        "enabled": false
-      },
-      {
-        "id": "p6",
-        "label": "Projector 6",
-        "kind": "source",
-        "source_name": "OUT_P6",
-        "monitor_index": null,
-        "enabled": false
-      },
-      {
-        "id": "p7",
-        "label": "Projector 7",
-        "kind": "source",
-        "source_name": "OUT_P7",
-        "monitor_index": null,
-        "enabled": false
-      },
-      {
-        "id": "p8",
-        "label": "Projector 8",
-        "kind": "source",
-        "source_name": "OUT_P8",
+        "label": "Blended display",
+        "kind": "program",
+        "source_name": null,
         "monitor_index": null,
         "enabled": false
       }

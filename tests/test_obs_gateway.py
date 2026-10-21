@@ -1,6 +1,6 @@
 from types import SimpleNamespace
 
-from tv_display_controller.config import ObsSettings
+from tv_display_controller.config import ObsSettings, ProjectorConfig
 from tv_display_controller.obs_gateway import ObsWebSocketGateway
 
 
@@ -9,6 +9,7 @@ class FakeObsClient:
         self.lookup_calls: list[tuple[str, str]] = []
         self.enabled_calls: list[tuple[str, int, bool]] = []
         self.program_scenes: list[str] = []
+        self.program_projectors: list[tuple[str, int]] = []
 
     def get_scene_item_id(self, scene_name: str, source_name: str) -> SimpleNamespace:
         self.lookup_calls.append((scene_name, source_name))
@@ -19,6 +20,14 @@ class FakeObsClient:
 
     def set_current_program_scene(self, scene_name: str) -> None:
         self.program_scenes.append(scene_name)
+
+    def open_video_mix_projector(
+        self,
+        video_mix_type: str,
+        monitor_index: int = -1,
+        projector_geometry: str | None = None,
+    ) -> None:
+        self.program_projectors.append((video_mix_type, monitor_index))
 
 
 class FakeCommissioningClient:
@@ -109,6 +118,25 @@ def test_custom_routing_normalizes_slots_then_changes_only_updated_assignment() 
     gateway.configure_custom_routing({**assignments, "p1": "FB_02"})
 
     assert [enabled for _, _, enabled in client.enabled_calls] == [True, False]
+
+
+def test_program_output_opens_once_on_blended_display() -> None:
+    gateway = ObsWebSocketGateway(ObsSettings())
+    client = FakeObsClient()
+    gateway._client = client  # type: ignore[assignment]
+    output = ProjectorConfig(
+        id="p1",
+        label="Blended display",
+        kind="program",
+        monitor_index=3,
+        enabled=True,
+    )
+
+    gateway.open_projectors([output])
+
+    assert client.program_projectors == [
+        ("OBS_WEBSOCKET_VIDEO_MIX_TYPE_PROGRAM", 3)
+    ]
 
 
 def test_commissioning_data_normalizes_obs_responses() -> None:

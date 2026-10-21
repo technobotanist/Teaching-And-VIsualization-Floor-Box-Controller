@@ -22,7 +22,7 @@
           <div>
             <p class="site-name"><span id="room-name">Teaching &amp; Visualization Lab</span> · <span id="site-name">Hunt Library</span></p>
             <h1>HDMI Floor Box Controller</h1>
-            <p class="product-name"><span>8 HDMI INPUTS</span><b aria-hidden="true">→</b><span>8-PROJECTOR ARRAY</span></p>
+            <p class="product-name"><span>8 HDMI INPUTS</span><b aria-hidden="true">→</b><span>1 BLENDED DISPLAY</span></p>
           </div>
         </div>
 
@@ -94,9 +94,9 @@
             <small id="fps-value">60 FPS</small>
           </div>
           <div class="system-metric">
-            <span>PROJECTOR ARRAY</span>
-            <strong id="output-count">0 of 8</strong>
-            <small id="output-state">Outputs locked</small>
+            <span id="output-label">BLENDED DISPLAY</span>
+            <strong id="output-count">Not configured</strong>
+            <small id="output-state">Full-screen target required</small>
           </div>
           <button class="output-button" id="open-outputs-button" type="button" disabled>
             Show active layout full screen
@@ -142,7 +142,7 @@
 
         <div class="custom-protected">
           <strong>Calibration remains locked</strong>
-          <p>The matrix changes source visibility inside <code>CUSTOM_SLOT_P1</code> through <code>CUSTOM_SLOT_P8</code>. It never edits <code>OUT_P1</code> through <code>OUT_P8</code>.</p>
+          <p>The matrix changes source visibility inside <code>CUSTOM_SLOT_P1</code> through <code>CUSTOM_SLOT_P8</code>. It never edits the display server's physical blend.</p>
         </div>
 
         <p class="custom-editor-status" id="custom-routing-status" role="status" aria-live="polite">Loading saved assignments.</p>

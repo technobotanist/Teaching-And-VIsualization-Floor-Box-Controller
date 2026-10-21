@@ -193,6 +193,11 @@ def create_app(
                 "topology": current_config.outputs.topology,
                 "auto_open": current_config.outputs.auto_open,
                 "projector_count": len(current_config.outputs.projectors),
+                "label": (
+                    "Blended display"
+                    if current_config.outputs.topology == "single-program"
+                    else "Projector array"
+                ),
             },
         }
 
@@ -386,6 +391,9 @@ def create_app(
         session = field_sessions.create(
             room_config.room.name,
             commissioning.snapshot(),
+            projector_ids=tuple(
+                projector.id for projector in room_config.outputs.projectors
+            ),
         )
         return _session_payload(session)
 

@@ -119,6 +119,7 @@ class FieldSessionStore:
         self,
         room_name: str,
         baseline: dict[str, object] | None = None,
+        projector_ids: tuple[str, ...] = PROJECTOR_IDS,
     ) -> FieldTestSession:
         with self._lock:
             session = FieldTestSession(
@@ -130,7 +131,7 @@ class FieldSessionStore:
                 },
                 projector_tests={
                     projector_id: ProjectorTestResult(projector_id=projector_id)
-                    for projector_id in PROJECTOR_IDS
+                    for projector_id in projector_ids
                 },
                 snapshots=[SessionSnapshot(kind="baseline", data=baseline or {})],
             )

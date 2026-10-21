@@ -154,13 +154,13 @@ def render_field_report(report: dict[str, object]) -> str:
   <header><div><div class="eyebrow">COMMISSIONING RECORD</div><h1>{title}</h1><p>Field test session {escape(report['session_id'])}</p></div><div><button onclick="window.print()">Print / Save PDF</button><p>Generated {generated_at}</p></div></header>
   <section class="summary">
     <div><strong>{summary['inputs_passed']} / {summary['input_count']}</strong><span>Inputs passed</span></div>
-    <div><strong>{summary['projectors_passed']} / {summary['projector_count']}</strong><span>Projectors passed</span></div>
+    <div><strong>{summary['projectors_passed']} / {summary['projector_count']}</strong><span>Display outputs passed</span></div>
     <div><strong>{summary['checks_passed']} / {summary['check_count']}</strong><span>Checks passed</span></div>
     <div><strong>{mode_exercise['completed_cycles']}</strong><span>Mode cycles</span></div>
   </section>
   <h2>Floor-box input map</h2>
   <table><thead><tr><th>OBS input</th><th>Capture device</th><th>Channel</th><th>Signal</th><th>Notes</th></tr></thead><tbody>{input_rows}</tbody></table>
-  <h2>Projector output map</h2>
+  <h2>Blended display output</h2>
   <table><thead><tr><th>Output</th><th>Monitor index</th><th>Result</th><th>Observed display</th><th>Notes</th></tr></thead><tbody>{projector_rows}</tbody></table>
   <h2>Acceptance checks</h2><ul>{check_rows}</ul>
   <h2>Exercise and soak</h2><p>Mode exercise: <strong>{escape(_status_label(mode_exercise['status']))}</strong>, {mode_exercise['switch_count']} switches across {mode_exercise['completed_cycles']} cycles. Soak started: {escape(str(soak['started_at'] or 'not started'))}; completed: {escape(str(soak['completed_at'] or 'not completed'))}.</p>

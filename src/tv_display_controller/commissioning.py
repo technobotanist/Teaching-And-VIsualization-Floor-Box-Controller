@@ -249,8 +249,12 @@ class CommissioningService:
             ),
             _check(
                 "monitors",
-                "OBS monitor discovery",
-                len(obs_data.monitors) >= 8,
+                (
+                    "Blended display discovery"
+                    if config.outputs.topology == "single-program"
+                    else "OBS monitor discovery"
+                ),
+                len(obs_data.monitors) >= len(config.outputs.projectors),
                 f"{len(obs_data.monitors)} display(s) visible to OBS",
             ),
         ]

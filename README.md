@@ -1,20 +1,20 @@
 # T&V HDMI Floor Box Controller
 
-Local HDMI floor-box and projector-array control software for the Teaching & Visualization Lab at NC State University's Hunt Library. OBS Studio remains the capture, compositing, calibration, and projector-output engine; this application presents a constrained operator interface over OBS WebSocket.
+Local HDMI floor-box and panoramic-display control software for the Teaching & Visualization Lab at NC State University's Hunt Library. OBS Studio composites one 11,860 x 1,080 Program canvas; the display server presents that canvas as one blended Windows monitor spanning the physical projector array.
 
 ## Prototype scope
 
 - Activates Wraparound, four Lecture variants, fixed Multi-source, Blank, and Custom Routing OBS scenes.
 - Exposes the same localhost API to the browser UI, Windows desktop shortcuts, Stream Deck actions, and a future wall-panel bridge.
-- Keeps logical room modes separate from physical projector calibration.
+- Keeps logical room modes separate from the display server's physical blend.
 - Runs without OBS in simulation mode for UI review and training.
 - Provides versioned configuration, backup, restore, commissioning, and operations workflows.
 
-The eight-output, two-GPU topology and all crop/blend geometry must be commissioned on the room workstation before projection output is enabled. The checked-in configuration intentionally does not guess Windows monitor indexes.
+The display server owns projector alignment, overlap, and blending. OBS opens one full-canvas Program projector on that blended Windows display. The checked-in configuration intentionally does not guess its monitor index.
 
 ## Architecture
 
-The browser UI, desktop shortcuts, Stream Deck, and a future wall-panel bridge all call one localhost API. The API controls a shared `ROUTE_ACTIVE` OBS scene over WebSocket. Eight persistent `OUT_P1` through `OUT_P8` projector scenes nest that router while retaining independent, locked calibration.
+The browser UI, desktop shortcuts, Stream Deck, and a future wall-panel bridge all call one localhost API. Mode commands select the corresponding OBS Program scene. One full-screen OBS Program window sends the complete panoramic canvas to the display server's blended monitor.
 
 See [Architecture](docs/ARCHITECTURE.md) and the [OBS scene contract](docs/OBS_SCENE_CONTRACT.md).
 
@@ -39,10 +39,10 @@ After setup, use either desktop icon:
 - **T&V Controller - Simulation** starts a preview without OBS or projectors.
 
 In the room controls, select a layout and use **Show [layout] full screen** to
-open the corresponding locked OBS outputs on all commissioned projector displays.
-For the one-source-per-projector layout, select **Multi-source**, then
-**Show Multi-source full screen**. This action remains disabled until projector
-monitor indexes are assigned and enabled during commissioning.
+open the complete OBS Program canvas on the blended display. For the apparent
+one-source-per-projector layout, select **Multi-source**, then
+**Show Multi-source full screen**. If the display is not configured yet, the
+button opens the one-time blended-display selection workflow.
 
 For a first-time preview, double-click **Start-Simulation.cmd** instead; it performs
 the same automatic setup. Both launchers start the server and open the browser.
@@ -81,22 +81,22 @@ The Commissioning Console provides:
 - Durable field-test sessions with guided floor-box mapping and visit notes.
 - OBS installation/process detection, Launch or Focus, guarded WebSocket configuration, and a manual setup walkthrough.
 - Automated OBS profile, canvas, frame-rate, input, scene, monitor, and live-stat checks.
-- Guarded, one-at-a-time projector ID cards, OBS output tests, and observed-result records.
+- Guarded blended-display identification and OBS Program output testing.
 - Automated mode cycling with an immediate Stop & Blank action.
 - Persistent soak/reboot checks plus downloadable JSON and print/PDF reports.
 - Four room-readiness gates and a one-hour acceptance timer.
 
-Physical cable identification and visual projector focus, overlap, feathering, color, crop, mask, and warp judgments still require a technician in the room. Geometry remains in locked OBS `OUT_Pn` scenes; the commissioning API cannot alter transforms or filters.
+Physical cable identification and visual projector focus, overlap, feathering, color, crop, mask, and warp judgments still require a technician in the room. That geometry belongs to the display server's blend configuration, outside OBS and this controller.
 
 For a standalone JSON inventory export, run `.\scripts\Collect-RoomInventory.ps1`.
 
-1. Complete [Commissioning](docs/COMMISSIONING.md), including the two-GPU soak test.
+1. Complete [Commissioning](docs/COMMISSIONING.md), including the blended-display soak test.
 2. Build the exact scenes in the [OBS scene contract](docs/OBS_SCENE_CONTRACT.md).
 3. Use **OBS Contract → Renderer connection** to configure authenticated WebSocket access while OBS is closed, or follow its manual walkthrough while OBS is open.
-4. Enter verified monitor indexes in `config/room.json`, then enable each commissioned output.
+4. Select the display server's blended Windows monitor in the Commissioning Console and enable it.
 5. Start with `.\scripts\Start-Controller.ps1`.
 
-The UI reports OBS and projector readiness. Physical outputs remain locked while the checked-in projector entries are disabled.
+The UI reports OBS and blended-display readiness. Full-screen presentation remains locked until the blended Windows monitor is selected.
 
 ## Automation
 
