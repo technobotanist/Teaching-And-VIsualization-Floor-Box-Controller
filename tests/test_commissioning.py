@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from dataclasses import replace
 from pathlib import Path
 
 from fastapi.testclient import TestClient
@@ -12,6 +13,18 @@ from tv_display_controller.obs_gateway import SimulatedObsGateway
 
 
 CONFIG_PATH = Path(__file__).parents[1] / "config" / "room.json"
+
+
+class RenamedSceneGateway(SimulatedObsGateway):
+    def commissioning_data(self):
+        data = super().commissioning_data()
+        return replace(
+            data,
+            scenes=[
+                "Multi Source Wall" if scene == "01_EIGHT_SOURCE" else scene
+                for scene in data.scenes
+            ],
+        )
 
 
 def test_simulation_cannot_satisfy_production_obs_gate(monkeypatch) -> None:
@@ -45,6 +58,51 @@ def test_projector_mapping_requires_confirmation(tmp_path: Path) -> None:
 
     assert response.status_code == 409
     assert load_config(config_path).outputs.projectors[0].monitor_index is None
+
+
+def test_mode_scene_mapping_uses_detected_obs_names_immediately(tmp_path: Path) -> None:
+    config_path = tmp_path / "room.json"
+    config_path.write_text(CONFIG_PATH.read_text(encoding="utf-8"), encoding="utf-8")
+    gateway = RenamedSceneGateway()
+    client = TestClient(create_app(load_config(config_path), gateway, config_path))
+    assignments = {
+        mode.id: (
+            "Multi Source Wall" if mode.id == "multi-source" else mode.scene
+        )
+        for mode in load_config(config_path).modes
+    }
+
+    response = client.put(
+        "/api/v1/commissioning/mode-scenes",
+        json={"assignments": assignments, "confirmation": "MAP OBS SCENES"},
+    )
+
+    assert response.status_code == 200
+    assert load_config(config_path).modes[5].scene == "Multi Source Wall"
+    activation = client.post("/api/v1/modes/multi-source/activate")
+    assert activation.status_code == 200
+    assert gateway.current_scene == "Multi Source Wall"
+
+
+def test_mode_scene_mapping_rejects_names_not_in_obs(tmp_path: Path) -> None:
+    config_path = tmp_path / "room.json"
+    config_path.write_text(CONFIG_PATH.read_text(encoding="utf-8"), encoding="utf-8")
+    client = TestClient(
+        create_app(load_config(config_path), SimulatedObsGateway(), config_path)
+    )
+    assignments = {
+        mode.id: ("Not an OBS scene" if mode.id == "blank" else mode.scene)
+        for mode in load_config(config_path).modes
+    }
+
+    response = client.put(
+        "/api/v1/commissioning/mode-scenes",
+        json={"assignments": assignments, "confirmation": "MAP OBS SCENES"},
+    )
+
+    assert response.status_code == 409
+    assert "was not found" in response.json()["detail"]
+    assert load_config(config_path).modes[-1].scene == "00_BLACK"
 
 
 def test_projector_mapping_persists_and_updates_controller(tmp_path: Path) -> None:

@@ -71,7 +71,10 @@ const elements = {
   resetSoak: document.querySelector("#reset-soak"),
   rebootMessage: document.querySelector("#reboot-message"),
   saveInput: document.querySelector("#save-input"),
+  saveSceneMapping: document.querySelector("#save-scene-mapping"),
   saveProjectorResult: document.querySelector("#save-projector-result"),
+  sceneMappingGrid: document.querySelector("#scene-mapping-grid"),
+  sceneMappingStatus: document.querySelector("#scene-mapping-status"),
   sessionNotes: document.querySelector("#session-notes"),
   showDisplayIdentifier: document.querySelector("#show-display-identifier"),
   soakClock: document.querySelector("#soak-clock"),
@@ -335,6 +338,66 @@ function renderObsChecks() {
     : `${Number(stats.average_frame_render_time).toFixed(2)} ms`;
   elements.statRenderSkips.textContent = String(stats.render_skipped_frames ?? "—");
   elements.statOutputSkips.textContent = String(stats.output_skipped_frames ?? "—");
+}
+
+function renderSceneMappings() {
+  elements.sceneMappingGrid.replaceChildren();
+  const mappings = state.snapshot?.mode_scene_mappings || [];
+  const scenes = state.snapshot?.obs?.scenes || [];
+
+  mappings.forEach((mapping) => {
+    const row = document.createElement("label");
+    row.className = "scene-mapping-row";
+    const name = document.createElement("span");
+    name.textContent = mapping.label;
+    const select = document.createElement("select");
+    select.dataset.modeId = mapping.id;
+    select.setAttribute("aria-label", `${mapping.label} OBS scene`);
+
+    if (!scenes.includes(mapping.scene)) {
+      const missing = document.createElement("option");
+      missing.value = "";
+      missing.textContent = `Select scene — configured name not found: ${mapping.scene}`;
+      select.append(missing);
+    }
+    scenes.forEach((sceneName) => {
+      const option = document.createElement("option");
+      option.value = sceneName;
+      option.textContent = sceneName;
+      option.selected = sceneName === mapping.scene;
+      select.append(option);
+    });
+    row.append(name, select);
+    elements.sceneMappingGrid.append(row);
+  });
+
+  const ready = mappings.length > 0 && scenes.length > 0 && !state.snapshot.obs_error;
+  elements.saveSceneMapping.disabled = !ready;
+  elements.sceneMappingStatus.textContent = !ready
+    ? "Connect OBS to read the scenes in its current collection."
+    : mappings.every((mapping) => scenes.includes(mapping.scene))
+      ? "Every room layout is mapped to an existing OBS scene."
+      : "One or more configured names are missing. Choose the correct OBS scenes, then save.";
+}
+
+function saveSceneMapping() {
+  const selects = Array.from(elements.sceneMappingGrid.querySelectorAll("select"));
+  const assignments = Object.fromEntries(
+    selects.map((select) => [select.dataset.modeId, select.value]),
+  );
+  if (Object.values(assignments).some((sceneName) => !sceneName)) {
+    showToast("Choose an existing OBS scene for every room layout");
+    return;
+  }
+  confirmAction({
+    phrase: "MAP OBS SCENES",
+    title: "Save OBS scene mapping",
+    detail: "Update every room-control button to call the selected scenes. OBS scene names and contents will not be changed.",
+    run: () => request("/api/v1/commissioning/mode-scenes", {
+      method: "PUT",
+      body: JSON.stringify({ assignments, confirmation: "MAP OBS SCENES" }),
+    }),
+  });
 }
 
 function renderObsSetup() {
@@ -795,6 +858,7 @@ function renderSnapshot() {
       : "OBS connected";
   renderSystem();
   renderObsChecks();
+  renderSceneMappings();
   renderProjectors();
   renderFieldSession();
 }
@@ -1012,6 +1076,7 @@ elements.obsSetupRefresh.addEventListener("click", loadObsSetup);
 elements.obsLaunch.addEventListener("click", launchOrFocusObs);
 elements.obsConfigureWebsocket.addEventListener("click", configureObsWebsocket);
 elements.obsSavePassword.addEventListener("click", saveManualObsPassword);
+elements.saveSceneMapping.addEventListener("click", saveSceneMapping);
 elements.startSession.addEventListener("click", startFieldSession);
 elements.completeSession.addEventListener("click", completeFieldSession);
 elements.sessionNotes.addEventListener("input", () => {

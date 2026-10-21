@@ -80,6 +80,8 @@ The Commissioning Console provides:
 - Read-only Windows GPU, monitor, and capture-device inventory.
 - Durable field-test sessions with guided floor-box mapping and visit notes.
 - OBS installation/process detection, Launch or Focus, guarded WebSocket configuration, and a manual setup walkthrough.
+- Live scene discovery and a saved room-layout-to-OBS-scene mapping, so existing
+  OBS scene names do not need to match repository defaults.
 - Automated OBS profile, canvas, frame-rate, input, scene, monitor, and live-stat checks.
 - Guarded blended-display identification and OBS Program output testing.
 - Automated mode cycling with an immediate Stop & Blank action.
@@ -91,10 +93,13 @@ Physical cable identification and visual projector focus, overlap, feathering, c
 For a standalone JSON inventory export, run `.\scripts\Collect-RoomInventory.ps1`.
 
 1. Complete [Commissioning](docs/COMMISSIONING.md), including the blended-display soak test.
-2. Build the exact scenes in the [OBS scene contract](docs/OBS_SCENE_CONTRACT.md).
+2. Build the required layouts in the [OBS scene contract](docs/OBS_SCENE_CONTRACT.md);
+   the listed names are defaults, not requirements.
 3. Use **OBS Contract → Renderer connection** to configure authenticated WebSocket access while OBS is closed, or follow its manual walkthrough while OBS is open.
-4. Select the display server's blended Windows monitor in the Commissioning Console and enable it.
-5. Start with `.\scripts\Start-Controller.ps1`.
+4. In **Room layout scene mapping**, select the existing OBS scene for every
+   operator layout and save the mapping.
+5. Select the display server's blended Windows monitor in the Commissioning Console and enable it.
+6. Start with `.\scripts\Start-Controller.ps1`.
 
 The UI reports OBS and blended-display readiness. Full-screen presentation remains locked until the blended Windows monitor is selected.
 

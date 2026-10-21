@@ -68,6 +68,40 @@ class ConfigStore:
             self._config = updated
             return updated
 
+    def set_mode_scenes(
+        self,
+        assignments: dict[str, str],
+    ) -> ControllerConfig:
+        with self._lock:
+            expected_ids = {mode.id for mode in self._config.modes}
+            assignment_ids = set(assignments)
+            if assignment_ids != expected_ids:
+                missing = sorted(expected_ids - assignment_ids)
+                extra = sorted(assignment_ids - expected_ids)
+                detail = []
+                if missing:
+                    detail.append(f"missing: {', '.join(missing)}")
+                if extra:
+                    detail.append(f"unknown: {', '.join(extra)}")
+                raise ConfigUpdateError(
+                    f"Scene mapping must cover every room mode ({'; '.join(detail)})"
+                )
+            if any(not scene_name.strip() for scene_name in assignments.values()):
+                raise ConfigUpdateError("OBS scene names cannot be empty")
+
+            config_data = self._config.model_dump()
+            for mode in config_data["modes"]:
+                mode["scene"] = assignments[mode["id"]].strip()
+            try:
+                updated = ControllerConfig.model_validate(config_data)
+            except ValidationError as error:
+                message = error.errors()[0].get("msg", "Invalid OBS scene mapping")
+                raise ConfigUpdateError(message.removeprefix("Value error, ")) from error
+
+            self._persist(updated)
+            self._config = updated
+            return updated
+
     def _persist(self, config: ControllerConfig) -> None:
         if self._path is None:
             return

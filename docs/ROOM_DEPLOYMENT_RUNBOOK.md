@@ -112,7 +112,8 @@ Estimated room time: 3-6 hours.
 
 1. Create Profile `T&V Display System` at `11860 x 1080`, 60 FPS.
 2. Create Scene Collection `T&V Production`.
-3. Build the exact scenes in [OBS_SCENE_CONTRACT.md](OBS_SCENE_CONTRACT.md).
+3. Build the required layouts in [OBS_SCENE_CONTRACT.md](OBS_SCENE_CONTRACT.md).
+   Existing scene names may be retained and mapped in the Commissioning Console.
 4. Build `01_EIGHT_SOURCE` first and verify floor boxes 1-8 appear in the approved projector mapping.
 5. Build `04_WRAPAROUND` and verify `SERVER_DESKTOP` spans the panoramic canvas.
 6. Build the four `06_` through `09_` Lecture scenes and verify they use only `FB_04`, `FB_05`, black, and `SERVER_DESKTOP` as specified.

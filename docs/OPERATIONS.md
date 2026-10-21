@@ -43,6 +43,9 @@ does not send video to the blended display.
 | `+` Custom Routing | `05_CUSTOM` | Editable source-to-projector assignments |
 
 The number keys shown above also work while the browser controller has focus.
+The scene names in this table are defaults. If the room's OBS collection uses
+different names, map them once under **Commissioning Console → OBS Contract →
+Room layout scene mapping**; operator buttons then use the saved names.
 
 ## Custom routing
 

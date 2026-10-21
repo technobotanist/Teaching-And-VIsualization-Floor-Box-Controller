@@ -6,7 +6,7 @@
     <meta name="theme-color" content="#171717">
     <title>Commissioning Console | T&amp;V Lab</title>
     <link rel="stylesheet" href="/assets/styles.css?v=0.2.1">
-    <link rel="stylesheet" href="/assets/commissioning.css?v=0.3.0">
+    <link rel="stylesheet" href="/assets/commissioning.css?v=0.3.1">
   </head>
   <body>
     <div class="commission-shell">
@@ -206,6 +206,19 @@
               </details>
             </section>
 
+            <section class="scene-mapping-workspace" aria-labelledby="scene-mapping-heading">
+              <div class="scene-mapping-heading">
+                <div>
+                  <span class="setup-number">SCENES</span>
+                  <h4 id="scene-mapping-heading">Room layout scene mapping</h4>
+                </div>
+                <button class="primary-button" id="save-scene-mapping" type="button">Save scene mapping</button>
+              </div>
+              <p>Choose the scene that already exists in OBS for each room-control button. OBS scenes are not renamed or rebuilt.</p>
+              <div class="scene-mapping-grid" id="scene-mapping-grid"></div>
+              <p class="scene-mapping-status" id="scene-mapping-status" role="status" aria-live="polite">Reading scenes from OBS.</p>
+            </section>
+
             <div class="check-list" id="obs-check-list"></div>
 
             <div class="stats-band">
@@ -367,6 +380,6 @@
     </dialog>
 
     <div class="toast" id="toast" role="status" aria-live="assertive"></div>
-    <script src="/assets/commissioning.js?v=0.3.0" defer></script>
+    <script src="/assets/commissioning.js?v=0.3.1" defer></script>
   </body>
 </html>

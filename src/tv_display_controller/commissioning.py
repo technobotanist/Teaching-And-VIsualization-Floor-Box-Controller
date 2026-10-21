@@ -15,7 +15,7 @@ from .config import (
     ControllerConfig,
     ProjectorConfig,
 )
-from .config_store import ConfigStore
+from .config_store import ConfigStore, ConfigUpdateError
 from .display_identifier import show_display_identifier
 from .obs_gateway import ObsCommissioningData, ObsGateway, ObsGatewayError
 
@@ -125,10 +125,31 @@ class CommissioningService:
             "obs_error": obs_error,
             "checks": checks,
             "obs_contract_ready": passed_required and not obs_payload.get("simulation", False),
+            "mode_scene_mappings": [
+                {
+                    "id": mode.id,
+                    "label": mode.label,
+                    "scene": mode.scene,
+                    "enabled": mode.enabled,
+                }
+                for mode in config.modes
+            ],
             "projectors": projectors,
             "commissioned_count": sum(projector.enabled for projector in config.outputs.projectors),
             "auto_open": config.outputs.auto_open,
         }
+
+    def set_mode_scenes(
+        self,
+        assignments: dict[str, str],
+    ) -> ControllerConfig:
+        obs_data = self._gateway.commissioning_data()
+        unknown_scenes = sorted(set(assignments.values()) - set(obs_data.scenes))
+        if unknown_scenes:
+            raise ConfigUpdateError(
+                f"OBS scene '{unknown_scenes[0]}' was not found in the current scene collection"
+            )
+        return self._store.set_mode_scenes(assignments)
 
     def refresh_inventory(self) -> dict[str, object]:
         collect_system_summary.cache_clear()

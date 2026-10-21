@@ -34,7 +34,10 @@ Stop here if OBS misses frames, a display disconnects, or monitor order changes 
 
 ## 2. Build the OBS contract
 
-Create the Profile and Scene Collection from `docs/OBS_SCENE_CONTRACT.md`. Build and test each logical scene before adding output geometry.
+Create the Profile and Scene Collection from `docs/OBS_SCENE_CONTRACT.md`. Build
+and test each logical scene, then use **Room layout scene mapping** to select the
+actual scene used for each operator mode. Existing scenes do not need to be
+renamed to the recommended defaults.
 
 Keep these layers independent:
 

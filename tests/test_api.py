@@ -200,8 +200,10 @@ def test_commissioning_interface_and_assets_are_served() -> None:
     assert "Commissioning Console" in page.text
     assert "Renderer connection" in page.text
     assert "Blended display output" in page.text
+    assert "Room layout scene mapping" in page.text
     assert script.status_code == 200
     assert "confirmAction" in script.text
     assert "loadObsSetup" in script.text
+    assert "/api/v1/commissioning/mode-scenes" in script.text
     assert stylesheet.status_code == 200
     assert ".projector-table" in stylesheet.text

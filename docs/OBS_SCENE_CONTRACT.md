@@ -13,7 +13,8 @@ Do not use Profiles as room modes.
 
 ## Scene collection
 
-Create one Scene Collection named `T&V Production` with these exact names:
+Create one Scene Collection named `T&V Production`. The names below are the
+recommended defaults:
 
 ```text
 00_BLACK
@@ -33,6 +34,12 @@ CUSTOM_SLOT_P6
 CUSTOM_SLOT_P7
 CUSTOM_SLOT_P8
 ```
+
+Existing production scenes do not have to be renamed. After connecting OBS, use
+**Commissioning Console → OBS Contract → Room layout scene mapping** to assign
+each room-control mode to the scene that already exists in the current collection.
+The controller persists those selections in `config/room.json` and uses them
+immediately. Scene contents must still satisfy the layout behavior below.
 
 ### Logical scenes
 

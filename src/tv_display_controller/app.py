@@ -68,6 +68,11 @@ class ObsPasswordSetupRequest(CommissioningRequest):
     confirmation: str
 
 
+class ModeSceneMappingRequest(CommissioningRequest):
+    assignments: dict[str, str]
+    confirmation: str
+
+
 class FieldSessionUpdateRequest(CommissioningRequest):
     current_phase: Literal["hardware", "obs-contract", "projectors", "acceptance"]
     notes: str = Field(default="", max_length=10000)
@@ -308,6 +313,24 @@ def create_app(
     @app.post("/api/v1/commissioning/inventory/refresh")
     def refresh_commissioning_inventory() -> dict[str, object]:
         return commissioning.refresh_inventory()
+
+    @app.put("/api/v1/commissioning/mode-scenes")
+    def update_mode_scenes(
+        request: ModeSceneMappingRequest,
+    ) -> dict[str, object]:
+        if request.confirmation != "MAP OBS SCENES":
+            raise HTTPException(
+                status_code=409,
+                detail="Type MAP OBS SCENES to confirm the scene mapping",
+            )
+        try:
+            updated = commissioning.set_mode_scenes(request.assignments)
+            controller.replace_config(updated, reset_outputs=False)
+            return commissioning.snapshot()
+        except ConfigUpdateError as error:
+            raise HTTPException(status_code=409, detail=str(error)) from error
+        except ObsGatewayError as error:
+            raise HTTPException(status_code=503, detail=str(error)) from error
 
     @app.put("/api/v1/commissioning/projectors/{projector_id}")
     def assign_projector(
