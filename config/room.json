@@ -1,0 +1,184 @@
+{
+  "room": {
+    "name": "Teaching & Visualization Lab",
+    "site": "James B. Hunt Jr. Library",
+    "canvas_width": 11860,
+    "canvas_height": 1080,
+    "fps": 60
+  },
+  "server": {
+    "host": "127.0.0.1",
+    "port": 8765
+  },
+  "obs": {
+    "host": "127.0.0.1",
+    "port": 4455,
+    "password_environment_variable": "OBS_WEBSOCKET_PASSWORD",
+    "timeout_seconds": 3.0
+  },
+  "outputs": {
+    "topology": "eight-source-projectors",
+    "router_scene": "ROUTE_ACTIVE",
+    "auto_open": false,
+    "projectors": [
+      {
+        "id": "p1",
+        "label": "Projector 1",
+        "kind": "source",
+        "source_name": "OUT_P1",
+        "monitor_index": null,
+        "enabled": false
+      },
+      {
+        "id": "p2",
+        "label": "Projector 2",
+        "kind": "source",
+        "source_name": "OUT_P2",
+        "monitor_index": null,
+        "enabled": false
+      },
+      {
+        "id": "p3",
+        "label": "Projector 3",
+        "kind": "source",
+        "source_name": "OUT_P3",
+        "monitor_index": null,
+        "enabled": false
+      },
+      {
+        "id": "p4",
+        "label": "Projector 4",
+        "kind": "source",
+        "source_name": "OUT_P4",
+        "monitor_index": null,
+        "enabled": false
+      },
+      {
+        "id": "p5",
+        "label": "Projector 5",
+        "kind": "source",
+        "source_name": "OUT_P5",
+        "monitor_index": null,
+        "enabled": false
+      },
+      {
+        "id": "p6",
+        "label": "Projector 6",
+        "kind": "source",
+        "source_name": "OUT_P6",
+        "monitor_index": null,
+        "enabled": false
+      },
+      {
+        "id": "p7",
+        "label": "Projector 7",
+        "kind": "source",
+        "source_name": "OUT_P7",
+        "monitor_index": null,
+        "enabled": false
+      },
+      {
+        "id": "p8",
+        "label": "Projector 8",
+        "kind": "source",
+        "source_name": "OUT_P8",
+        "monitor_index": null,
+        "enabled": false
+      }
+    ]
+  },
+  "custom_routing": {
+    "assignments": {
+      "p1": "FB_01",
+      "p2": "FB_02",
+      "p3": "FB_03",
+      "p4": "FB_04",
+      "p5": "FB_05",
+      "p6": "FB_06",
+      "p7": "FB_07",
+      "p8": "FB_08"
+    }
+  },
+  "modes": [
+    {
+      "id": "wraparound",
+      "label": "Wraparound",
+      "key": "1",
+      "scene": "04_WRAPAROUND",
+      "route_source": null,
+      "detail": "Server desktop across the full array",
+      "kind": "layout",
+      "enabled": true
+    },
+    {
+      "id": "lecture-single",
+      "label": "Lecture Single",
+      "key": "2",
+      "scene": "06_LECTURE_SINGLE",
+      "route_source": null,
+      "detail": "Floor boxes 4 + 5 centered",
+      "kind": "layout",
+      "enabled": true
+    },
+    {
+      "id": "lecture-double",
+      "label": "Lecture Double",
+      "key": "3",
+      "scene": "07_LECTURE_DOUBLE",
+      "route_source": null,
+      "detail": "Floor boxes 4 + 5 repeated twice",
+      "kind": "layout",
+      "enabled": true
+    },
+    {
+      "id": "lecture-single-background",
+      "label": "Lecture Single + Background",
+      "key": "4",
+      "scene": "08_LECTURE_SINGLE_BACKGROUND",
+      "route_source": null,
+      "detail": "Centered pair over server desktop",
+      "kind": "layout",
+      "enabled": true
+    },
+    {
+      "id": "lecture-double-background",
+      "label": "Lecture Double + Background",
+      "key": "5",
+      "scene": "09_LECTURE_DOUBLE_BACKGROUND",
+      "route_source": null,
+      "detail": "Repeated pair over server desktop",
+      "kind": "layout",
+      "enabled": true
+    },
+    {
+      "id": "multi-source",
+      "label": "Multi-source",
+      "key": "8",
+      "scene": "01_EIGHT_SOURCE",
+      "route_source": null,
+      "detail": "Approved floor-box-to-projector map",
+      "kind": "layout",
+      "enabled": true
+    },
+    {
+      "id": "custom",
+      "label": "Custom Routing",
+      "key": "+",
+      "scene": "05_CUSTOM",
+      "route_source": null,
+      "detail": "Editable projector assignment map",
+      "kind": "custom",
+      "enabled": true
+    },
+    {
+      "id": "blank",
+      "label": "Blank",
+      "key": "0",
+      "scene": "00_BLACK",
+      "route_source": null,
+      "detail": "Black output",
+      "kind": "blank",
+      "enabled": true
+    }
+  ]
+}

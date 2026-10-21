@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="144" height="144" viewBox="0 0 144 144" role="img" aria-labelledby="title">
+  <title id="title">Wraparound</title>
+  <rect width="144" height="144" rx="8" fill="#171717"/>
+  <rect width="144" height="10" fill="#cc0000"/>
+  <text x="14" y="72" fill="#ffffff" font-family="Arial, sans-serif" font-size="64" font-weight="700">1</text>
+  <text x="100" y="48" fill="#ffffff" font-family="Arial, sans-serif" font-size="11" font-weight="700" text-anchor="middle">WRAP</text>
+  <text x="100" y="61" fill="#ffffff" font-family="Arial, sans-serif" font-size="11" font-weight="700" text-anchor="middle">AROUND</text>
+  <rect x="14" y="104" width="116" height="18" fill="#ffffff"/>
+  <path d="M31 104v18M48 104v18M65 104v18M82 104v18M99 104v18M116 104v18" stroke="#b7bdc1" stroke-width="2"/>
+</svg>

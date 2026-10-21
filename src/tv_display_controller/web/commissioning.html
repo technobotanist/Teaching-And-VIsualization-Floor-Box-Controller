@@ -1,0 +1,372 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#171717">
+    <title>Commissioning Console | T&amp;V Lab</title>
+    <link rel="stylesheet" href="/assets/styles.css?v=0.2.1">
+    <link rel="stylesheet" href="/assets/commissioning.css?v=0.3.0">
+  </head>
+  <body>
+    <div class="commission-shell">
+      <header class="commission-header">
+        <div class="commission-brand">
+          <a class="icon-button" href="/" aria-label="Return to room controls" title="Return to room controls">
+            <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="m15 18-6-6 6-6"></path>
+            </svg>
+          </a>
+          <div class="identity-mark" aria-hidden="true">
+            <span class="mark-label">HDMI</span>
+            <span class="port-bank">
+              <i></i><i></i><i></i><i></i>
+              <i></i><i></i><i></i><i></i>
+            </span>
+            <span class="mark-footer">FLOOR BOX</span>
+          </div>
+          <div>
+            <p class="site-name">ADMIN WORKSPACE</p>
+            <h1>Commissioning Console</h1>
+            <p class="product-name">Hardware → OBS → Projector Array</p>
+          </div>
+        </div>
+        <div class="commission-state" id="commission-state" role="status" aria-live="polite">
+          <span class="connection-light" aria-hidden="true"></span>
+          <span><small>OBS ENGINE</small><strong id="engine-state">Checking</strong></span>
+        </div>
+      </header>
+
+      <section class="field-session-bar" aria-labelledby="field-session-heading">
+        <div class="field-session-identity">
+          <span>FIELD TEST SESSION</span>
+          <strong id="field-session-heading">No active room visit</strong>
+          <small id="field-session-detail">Start a session before recording physical observations.</small>
+        </div>
+        <label class="field-session-notes" for="session-notes">
+          <span>VISIT NOTES</span>
+          <textarea id="session-notes" rows="2" maxlength="10000" placeholder="Issues, cable changes, follow-up work" disabled></textarea>
+        </label>
+        <div class="field-session-actions">
+          <button class="primary-button" id="start-session" type="button">Start room visit</button>
+          <a class="secondary-button" id="json-report" href="#" download hidden>Export JSON</a>
+          <a class="secondary-button" id="html-report" href="#" target="_blank" rel="noopener" hidden>Print report</a>
+          <button class="secondary-button" id="complete-session" type="button" hidden>Complete visit</button>
+        </div>
+      </section>
+
+      <main class="commission-main">
+        <nav class="step-nav" aria-label="Commissioning phases">
+          <button class="step-tab is-active" type="button" data-panel-target="hardware">
+            <span>01</span><strong>Hardware</strong><small>Inventory and signal path</small>
+          </button>
+          <button class="step-tab" type="button" data-panel-target="obs-contract">
+            <span>02</span><strong>OBS Contract</strong><small>Profile, scenes, inputs</small>
+          </button>
+          <button class="step-tab" type="button" data-panel-target="projectors">
+            <span>03</span><strong>Projector Map</strong><small>Displays and output tests</small>
+          </button>
+          <button class="step-tab" type="button" data-panel-target="acceptance">
+            <span>04</span><strong>Acceptance</strong><small>Soak, recovery, handoff</small>
+          </button>
+        </nav>
+
+        <div class="commission-workspace">
+          <div class="workspace-banner">
+            <div>
+              <p class="section-kicker" id="phase-kicker">PHASE 01</p>
+              <h2 id="phase-title">Hardware inventory</h2>
+            </div>
+            <div class="completion-meter" aria-label="Commissioning progress">
+              <span><b id="completion-count">0</b> / 4 phases ready</span>
+              <div><i id="completion-bar"></i></div>
+            </div>
+          </div>
+
+          <section class="commission-panel is-active" data-panel="hardware" aria-labelledby="hardware-heading">
+            <div class="panel-heading">
+              <div>
+                <h3 id="hardware-heading">Room workstation</h3>
+                <p>Read-only inventory from the server running this controller.</p>
+              </div>
+              <button class="secondary-button" id="refresh-inventory" type="button">
+                Refresh inventory
+              </button>
+            </div>
+
+            <div class="metric-strip">
+              <div><span>COMPUTER</span><strong id="computer-name">—</strong><small id="windows-version">Waiting</small></div>
+              <div><span>GRAPHICS</span><strong id="gpu-count">—</strong><small>GPU adapters</small></div>
+              <div><span>DISPLAYS</span><strong id="monitor-device-count">—</strong><small>Windows monitor devices</small></div>
+              <div><span>CAPTURE</span><strong id="media-device-count">—</strong><small>Media-device candidates</small></div>
+            </div>
+
+            <div class="inventory-grid">
+              <section>
+                <h4>Graphics adapters</h4>
+                <div class="data-list" id="gpu-list"><p class="empty-state">Loading inventory…</p></div>
+              </section>
+              <section>
+                <h4>Monitor devices</h4>
+                <div class="data-list" id="monitor-device-list"><p class="empty-state">Loading inventory…</p></div>
+              </section>
+              <section>
+                <h4>Capture candidates</h4>
+                <div class="data-list" id="media-device-list"><p class="empty-state">Loading inventory…</p></div>
+              </section>
+            </div>
+
+            <section class="field-tool input-mapper" aria-labelledby="input-mapper-heading">
+              <div class="field-tool-heading">
+                <div>
+                  <span class="setup-number">FIELD MAP</span>
+                  <h4 id="input-mapper-heading">Floor-box signal path</h4>
+                  <p>Connect the known-good HDMI source, identify its capture channel, then save the observation.</p>
+                </div>
+                <strong id="input-map-progress">0 / 8 passed</strong>
+              </div>
+              <div class="guided-step" id="input-mapper-controls">
+                <div class="guided-index">
+                  <span id="input-step-number">INPUT 01 / 08</span>
+                  <strong id="input-source-name">FB_01</strong>
+                </div>
+                <label><span>PHYSICAL FLOOR LABEL</span><input id="input-floor-label" type="text" maxlength="120" placeholder="Lectern east"></label>
+                <label><span>CAPTURE DEVICE</span><input id="input-capture-device" type="text" maxlength="240" list="capture-device-options" placeholder="Card or device name"></label>
+                <label><span>CARD INPUT / CHANNEL</span><input id="input-capture-channel" type="text" maxlength="120" placeholder="Input 1"></label>
+                <label><span>SIGNAL RESULT</span><select id="input-signal-status"><option value="untested">Untested</option><option value="pass">Pass</option><option value="fail">Fail</option></select></label>
+                <label class="guided-notes"><span>NOTES</span><input id="input-notes" type="text" maxlength="1000" placeholder="Resolution, frame rate, or fault"></label>
+                <div class="guided-actions">
+                  <button class="secondary-button" id="previous-input" type="button">Previous</button>
+                  <button class="primary-button" id="save-input" type="button">Save &amp; next</button>
+                </div>
+              </div>
+              <datalist id="capture-device-options"></datalist>
+            </section>
+
+            <div class="manual-gate">
+              <div><span class="gate-number">GATE 1</span><strong>Physical verification</strong></div>
+              <label><input type="checkbox" data-check="inputs-verified"> HDMI signal tested at floor boxes 1-8</label>
+              <label><input type="checkbox" data-check="outputs-identified"> Windows Identify matched to projectors P1-P8</label>
+              <label><input type="checkbox" data-check="hardware-soak"> Eight-input/eight-output one-hour soak passed</label>
+            </div>
+          </section>
+
+          <section class="commission-panel" data-panel="obs-contract" aria-labelledby="obs-heading" hidden>
+            <div class="panel-heading">
+              <div>
+                <h3 id="obs-heading">OBS display-engine contract</h3>
+                <p>Automated checks against the live OBS WebSocket session.</p>
+              </div>
+              <button class="secondary-button" id="refresh-obs" type="button">Run checks</button>
+            </div>
+
+            <section class="obs-setup-workspace" aria-labelledby="obs-setup-heading">
+              <div class="obs-setup-heading">
+                <div>
+                  <span class="setup-number">SETUP</span>
+                  <h4 id="obs-setup-heading">Renderer connection</h4>
+                </div>
+                <div class="button-group">
+                  <button class="secondary-button" id="obs-setup-refresh" type="button">Refresh</button>
+                  <button class="primary-button" id="obs-launch" type="button" disabled>Launch OBS</button>
+                </div>
+              </div>
+
+              <div class="obs-setup-status">
+                <div><span>INSTALLATION</span><strong id="obs-install-state">Checking</strong><small id="obs-install-path">—</small></div>
+                <div><span>PROCESS</span><strong id="obs-process-state">Checking</strong><small>Launch or focus from this console</small></div>
+                <div><span>WEBSOCKET</span><strong id="obs-websocket-state">Checking</strong><small id="obs-websocket-detail">Port 4455</small></div>
+                <div><span>AUTHENTICATION</span><strong id="obs-auth-state">Checking</strong><small id="obs-auth-detail">Managed locally</small></div>
+              </div>
+
+              <div class="obs-setup-actions">
+                <label for="obs-websocket-port">
+                  <span>WEBSOCKET PORT</span>
+                  <input id="obs-websocket-port" type="number" min="1" max="65535" value="4455">
+                </label>
+                <button class="primary-button" id="obs-configure-websocket" type="button" disabled>Configure securely</button>
+                <p id="obs-setup-message" role="status" aria-live="polite">Reading OBS settings.</p>
+              </div>
+
+              <details class="obs-manual-setup">
+                <summary>Manual OBS walkthrough</summary>
+                <ol>
+                  <li>Open <strong>Tools → WebSocket Server Settings</strong>.</li>
+                  <li>Enable the WebSocket server and keep the configured port.</li>
+                  <li>Enable authentication, choose a password, and enter that same password below.</li>
+                  <li>Select <strong>Apply</strong> in OBS, save the controller credential, then refresh.</li>
+                </ol>
+                <div class="obs-manual-credential">
+                  <label for="obs-manual-password">
+                    <span>CONTROLLER PASSWORD</span>
+                    <input id="obs-manual-password" type="password" minlength="12" autocomplete="new-password">
+                  </label>
+                  <button class="secondary-button" id="obs-save-password" type="button">Save credential</button>
+                </div>
+              </details>
+            </section>
+
+            <div class="check-list" id="obs-check-list"></div>
+
+            <div class="stats-band">
+              <div><span>ACTIVE FPS</span><strong id="stat-fps">—</strong></div>
+              <div><span>RENDER TIME</span><strong id="stat-render-time">—</strong></div>
+              <div><span>RENDER SKIPS</span><strong id="stat-render-skips">—</strong></div>
+              <div><span>OUTPUT SKIPS</span><strong id="stat-output-skips">—</strong></div>
+            </div>
+
+            <div class="manual-gate">
+              <div><span class="gate-number">GATE 2</span><strong>Content verification</strong></div>
+              <label><input type="checkbox" data-check="input-order"> Floor boxes appear in physical left-to-right order</label>
+              <label><input type="checkbox" data-check="opaque-scenes"> All seven modes plus Blank cover the complete panoramic canvas</label>
+              <label><input type="checkbox" data-check="route-switching"> Repeated mode switching shows no stale or transparent region</label>
+            </div>
+          </section>
+
+          <section class="commission-panel" data-panel="projectors" aria-labelledby="projector-heading" hidden>
+            <div class="panel-heading">
+              <div>
+                <h3 id="projector-heading">Projector output map</h3>
+                <p>Assign and test one physical display at a time. Geometry remains locked in OBS.</p>
+              </div>
+              <div class="count-badge"><strong id="commissioned-count">0</strong> / 8 enabled</div>
+            </div>
+
+            <div class="safety-notice">
+              <strong>Room-impacting controls</strong>
+              <span>Saving changes writes the room configuration. Testing opens an OBS source projector on the selected display.</span>
+            </div>
+
+            <section class="field-tool projector-identifier" aria-labelledby="projector-identifier-heading">
+              <div class="field-tool-heading">
+                <div>
+                  <span class="setup-number">ONE AT A TIME</span>
+                  <h4 id="projector-identifier-heading">Physical projector identification</h4>
+                  <p>Open one saved output, observe the room, and record where it appeared.</p>
+                </div>
+                <strong id="projector-test-progress">0 / 8 passed</strong>
+              </div>
+              <div class="projector-test-console">
+                <div class="projector-test-target">
+                  <label for="projector-test-target"><span>OUTPUT UNDER TEST</span></label>
+                  <select id="projector-test-target"></select>
+                  <strong id="projector-test-expected">Assign a Windows display below first</strong>
+                </div>
+                <div class="projector-identify-actions">
+                  <button class="secondary-button" id="show-display-identifier" type="button">Show ID card</button>
+                  <button class="primary-button" id="open-projector-test" type="button">Open selected output</button>
+                </div>
+                <label><span>OBSERVED DISPLAY / ROOM LABEL</span><input id="projector-observed-display" type="text" maxlength="240" placeholder="North wall, second from left"></label>
+                <label><span>RESULT</span><select id="projector-test-status"><option value="untested">Untested</option><option value="pass">Correct projector</option><option value="wrong_display">Wrong projector</option><option value="no_signal">No signal</option></select></label>
+                <label class="projector-test-notes"><span>NOTES</span><input id="projector-test-notes" type="text" maxlength="1000" placeholder="Unexpected display, cable, or image issue"></label>
+                <button class="secondary-button" id="save-projector-result" type="button">Save result &amp; next</button>
+              </div>
+            </section>
+
+            <div class="projector-table" role="table" aria-label="Projector monitor assignments">
+              <div class="projector-row projector-table-head" role="row">
+                <span role="columnheader">Output</span>
+                <span role="columnheader">OBS source</span>
+                <span role="columnheader">Windows display</span>
+                <span role="columnheader">Enabled</span>
+                <span role="columnheader">Actions</span>
+              </div>
+              <div id="projector-rows"></div>
+            </div>
+
+            <div class="manual-gate">
+              <div><span class="gate-number">GATE 3</span><strong>Calibration verification</strong></div>
+              <label><input type="checkbox" data-check="geometry-locked"> All OUT_P1-OUT_P8 geometry and mask items are locked</label>
+              <label><input type="checkbox" data-check="seams-verified"> Every seam remains aligned in all seven room modes</label>
+              <label><input type="checkbox" data-check="no-editor-output"> No OBS editor or controller window appears on the array</label>
+            </div>
+          </section>
+
+          <section class="commission-panel" data-panel="acceptance" aria-labelledby="acceptance-heading" hidden>
+            <div class="panel-heading">
+              <div>
+                <h3 id="acceptance-heading">Production acceptance</h3>
+                <p>Final stability, recovery, and staff handoff.</p>
+              </div>
+              <div class="acceptance-state" id="acceptance-state">Not ready</div>
+            </div>
+
+            <section class="mode-exercise-console" aria-labelledby="mode-exercise-heading">
+              <div class="mode-exercise-heading">
+                <div>
+                  <span>AUTOMATED ROUTE TEST</span>
+                  <h4 id="mode-exercise-heading">Mode exercise</h4>
+                  <p id="mode-exercise-message">Select modes and start a controlled switching run.</p>
+                </div>
+                <div class="exercise-counter"><strong id="exercise-cycles">0</strong><span>cycles</span><small id="exercise-switches">0 switches</small></div>
+              </div>
+              <div class="mode-selection" id="mode-selection"></div>
+              <div class="exercise-controls">
+                <label><span>SECONDS PER MODE</span><input id="exercise-interval" type="number" min="1" max="60" value="5"></label>
+                <label><span>TARGET CYCLES</span><input id="exercise-target" type="number" min="1" max="100" value="25"></label>
+                <button class="primary-button" id="start-exercise" type="button">Start mode exercise</button>
+                <button class="stop-button" id="stop-exercise" type="button" disabled>Stop &amp; Blank</button>
+              </div>
+            </section>
+
+            <div class="soak-console">
+              <div>
+                <span>ONE-HOUR SOAK</span>
+                <time id="soak-clock" datetime="PT1H">01:00:00</time>
+                <small id="soak-message">Timer has not started</small>
+              </div>
+              <div class="button-group">
+                <button class="primary-button" id="start-soak" type="button">Start soak</button>
+                <button class="secondary-button" id="reset-soak" type="button">Reset</button>
+              </div>
+            </div>
+
+            <section class="reboot-console" aria-labelledby="reboot-heading">
+              <div>
+                <span>REBOOT VERIFICATION</span>
+                <h4 id="reboot-heading">Topology snapshots</h4>
+                <p id="reboot-message">Capture the room state before reboot, then capture it again after recovery.</p>
+              </div>
+              <div class="button-group">
+                <button class="secondary-button" id="capture-pre-reboot" type="button">Capture before reboot</button>
+                <button class="secondary-button" id="capture-post-reboot" type="button">Capture after reboot</button>
+              </div>
+            </section>
+
+            <div class="acceptance-checks">
+              <label><input type="checkbox" data-check="switch-cycles"> Every mode switched at least 25 times</label>
+              <label><input type="checkbox" data-check="power-cycle"> Workstation power-cycle recovery passed</label>
+              <label><input type="checkbox" data-check="input-recovery"> HDMI disconnect/reconnect recovery passed</label>
+              <label><input type="checkbox" data-check="shortcuts-installed"> Desktop and Stream Deck controls installed</label>
+              <label><input type="checkbox" data-check="backup-restored"> Known-good backup and restore drill passed</label>
+              <label><input type="checkbox" data-check="staff-trained"> Staff start, Blank, Custom, and recovery walkthrough completed</label>
+            </div>
+
+            <div class="manual-gate final-gate">
+              <div><span class="gate-number">GATE 4</span><strong>Production release</strong></div>
+              <p>Release only after the soak timer and every acceptance item are complete.</p>
+              <a class="secondary-button" href="/">Return to room controls</a>
+            </div>
+          </section>
+        </div>
+      </main>
+    </div>
+
+    <dialog class="confirm-dialog" id="confirm-dialog">
+      <form method="dialog" id="confirm-form">
+        <p class="section-kicker">CONFIRM ROOM CHANGE</p>
+        <h2 id="confirm-title">Confirm action</h2>
+        <p id="confirm-detail"></p>
+        <label for="confirm-input">Type <strong id="confirm-phrase"></strong></label>
+        <input id="confirm-input" type="text" autocomplete="off" spellcheck="false">
+        <div class="dialog-actions">
+          <button class="secondary-button" value="cancel" type="button" id="cancel-confirm">Cancel</button>
+          <button class="primary-button" value="confirm" type="submit" id="submit-confirm" disabled>Confirm</button>
+        </div>
+      </form>
+    </dialog>
+
+    <div class="toast" id="toast" role="status" aria-live="assertive"></div>
+    <script src="/assets/commissioning.js?v=0.3.0" defer></script>
+  </body>
+</html>

@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#171717">
+    <title>HDMI Floor Box Controller | T&V Lab</title>
+    <link rel="stylesheet" href="/assets/styles.css?v=0.2.1">
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar">
+        <div class="identity">
+          <div class="identity-mark" aria-hidden="true">
+            <span class="mark-label">HDMI</span>
+            <span class="port-bank">
+              <i></i><i></i><i></i><i></i>
+              <i></i><i></i><i></i><i></i>
+            </span>
+            <span class="mark-footer">FLOOR BOX</span>
+          </div>
+          <div>
+            <p class="site-name"><span id="room-name">Teaching &amp; Visualization Lab</span> · <span id="site-name">Hunt Library</span></p>
+            <h1>HDMI Floor Box Controller</h1>
+            <p class="product-name"><span>8 HDMI INPUTS</span><b aria-hidden="true">→</b><span>8-PROJECTOR ARRAY</span></p>
+          </div>
+        </div>
+
+        <div class="topbar-actions">
+          <div class="connection" id="connection" role="status" aria-live="polite">
+            <span class="connection-light" aria-hidden="true"></span>
+            <span>
+              <small>OBS ENGINE</small>
+              <strong id="connection-label">Connecting</strong>
+            </span>
+          </div>
+          <button class="icon-button" id="refresh-button" type="button" aria-label="Refresh system status" title="Refresh system status">
+            <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 12a9 9 0 0 0-15.2-6.5L3 8"></path>
+              <path d="M3 3v5h5"></path>
+              <path d="M3 12a9 9 0 0 0 15.2 6.5L21 16"></path>
+              <path d="M16 16h5v5"></path>
+            </svg>
+          </button>
+          <a class="icon-button" href="/commissioning" aria-label="Open commissioning console" title="Open commissioning console">
+            <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14.7 6.3a4 4 0 0 0-5-5L7.4 3.6l3 3 2.3-2.3"></path>
+              <path d="m5 8-3 3 11 11 3-3"></path>
+              <path d="m14 17 5-5"></path>
+              <path d="m17 14 3 3 2-2-3-3"></path>
+            </svg>
+          </a>
+          <button class="icon-button" id="fullscreen-button" type="button" aria-label="Enter full screen" title="Enter full screen">
+            <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M8 3H5a2 2 0 0 0-2 2v3"></path>
+              <path d="M16 3h3a2 2 0 0 1 2 2v3"></path>
+              <path d="M8 21H5a2 2 0 0 1-2-2v-3"></path>
+              <path d="M16 21h3a2 2 0 0 0 2-2v-3"></path>
+            </svg>
+          </button>
+        </div>
+      </header>
+
+      <main>
+        <section class="mode-section" aria-labelledby="modes-heading">
+          <div class="section-heading">
+            <div>
+              <p class="section-kicker">HDMI FLOOR BOX ROUTING</p>
+              <h2 id="modes-heading">Display layouts</h2>
+            </div>
+            <div class="live-scene">
+              <span>LIVE SCENE</span>
+              <strong id="active-scene">Awaiting OBS</strong>
+            </div>
+          </div>
+
+          <div class="mode-grid" id="mode-grid" aria-live="polite">
+            <div class="mode-skeleton"></div>
+            <div class="mode-skeleton"></div>
+            <div class="mode-skeleton"></div>
+            <div class="mode-skeleton"></div>
+          </div>
+        </section>
+
+        <section class="system-rail" aria-label="Room system status">
+          <div class="system-metric">
+            <span>INPUT BANK</span>
+            <strong>8 HDMI floor boxes</strong>
+            <small>Direct capture feeds</small>
+          </div>
+          <div class="system-metric">
+            <span>PANORAMIC CANVAS</span>
+            <strong id="canvas-value">11,860 × 1,080</strong>
+            <small id="fps-value">60 FPS</small>
+          </div>
+          <div class="system-metric">
+            <span>PROJECTOR ARRAY</span>
+            <strong id="output-count">0 of 8</strong>
+            <small id="output-state">Outputs locked</small>
+          </div>
+          <button class="output-button" id="open-outputs-button" type="button" disabled>
+            Open projector outputs
+          </button>
+        </section>
+      </main>
+
+      <footer>
+        <span>NC State University Libraries</span>
+        <span id="system-clock" aria-label="Current time"></span>
+      </footer>
+    </div>
+
+    <dialog class="custom-dialog" id="custom-dialog" aria-labelledby="custom-dialog-title">
+      <div class="custom-dialog-shell">
+        <header class="custom-dialog-header">
+          <div>
+            <p class="section-kicker">PROJECTOR ASSIGNMENT</p>
+            <h2 id="custom-dialog-title">Custom Routing</h2>
+          </div>
+          <button class="custom-close" id="custom-close" type="button" aria-label="Close custom routing" title="Close">
+            <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+              <path d="M18 6 6 18"></path>
+              <path d="m6 6 12 12"></path>
+            </svg>
+          </button>
+        </header>
+
+        <div class="custom-live-banner">
+          <span class="custom-live-dot" aria-hidden="true"></span>
+          <div>
+            <strong id="custom-live-state">05_CUSTOM IS LIVE</strong>
+            <p>Applying this matrix routes one floor-box source or black to each calibrated projector slot.</p>
+          </div>
+        </div>
+
+        <div class="custom-routing-intro">
+          <strong>Projector assignment matrix</strong>
+          <p>A floor box may feed more than one projector. Select Blank for any projector that should remain black.</p>
+        </div>
+
+        <div class="routing-grid" id="custom-routing-grid" aria-label="Custom projector assignments"></div>
+
+        <div class="custom-protected">
+          <strong>Calibration remains locked</strong>
+          <p>The matrix changes source visibility inside <code>CUSTOM_SLOT_P1</code> through <code>CUSTOM_SLOT_P8</code>. It never edits <code>OUT_P1</code> through <code>OUT_P8</code>.</p>
+        </div>
+
+        <p class="custom-editor-status" id="custom-routing-status" role="status" aria-live="polite">Loading saved assignments.</p>
+
+        <div class="custom-actions">
+          <button class="custom-blank-button" id="custom-blank" type="button">Blank array</button>
+          <button class="custom-secondary-button" id="custom-reset" type="button">Reset 1:1</button>
+          <button class="custom-secondary-button" id="custom-cancel" type="button">Cancel</button>
+          <button class="custom-primary-button" id="custom-apply" type="button">Apply routing</button>
+        </div>
+      </div>
+    </dialog>
+
+    <div class="toast" id="toast" role="status" aria-live="assertive"></div>
+    <noscript>This controller requires JavaScript.</noscript>
+    <script src="/assets/app.js?v=0.2.1" defer></script>
+  </body>
+</html>

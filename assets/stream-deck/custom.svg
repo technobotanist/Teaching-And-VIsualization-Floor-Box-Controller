@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="144" height="144" viewBox="0 0 144 144" role="img" aria-labelledby="title">
+  <title id="title">Custom</title>
+  <rect width="144" height="144" rx="8" fill="#f1f3f4"/>
+  <rect width="144" height="10" fill="#cc0000"/>
+  <text x="14" y="72" fill="#171717" font-family="Arial, sans-serif" font-size="64" font-weight="700">+</text>
+  <text x="99" y="51" fill="#171717" font-family="Arial, sans-serif" font-size="13" font-weight="700" text-anchor="middle">CUSTOM</text>
+  <rect x="14" y="103" width="35" height="20" fill="#171717"/>
+  <rect x="53" y="103" width="22" height="20" fill="#cc0000"/>
+  <rect x="79" y="103" width="51" height="20" fill="#697078"/>
+</svg>
