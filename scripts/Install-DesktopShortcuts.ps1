@@ -5,7 +5,7 @@ param(
 
 $ErrorActionPreference = "Stop"
 $ProjectRoot = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
-$PowerShell = (Get-Command powershell.exe -ErrorAction Stop).Source
+$PowerShell = Join-Path $env:SystemRoot "System32\WindowsPowerShell\v1.0\powershell.exe"
 $Shell = New-Object -ComObject WScript.Shell
 
 function New-ControllerShortcut {
@@ -24,10 +24,20 @@ function New-ControllerShortcut {
     $Shortcut.Save()
 }
 
-$StartScript = Join-Path $PSScriptRoot "Start-Controller.ps1"
+$StartLauncher = Join-Path $ProjectRoot "Start-Controller.cmd"
 $SwitchScript = Join-Path $PSScriptRoot "Switch-Mode.ps1"
 
-New-ControllerShortcut -Name "T&V HDMI Floor Box Controller" -Script $StartScript
+foreach ($Launcher in @(
+    @{ Name = "T&V HDMI Floor Box Controller"; Arguments = "" },
+    @{ Name = "T&V Controller - Simulation"; Arguments = "-Simulate" }
+)) {
+    $Shortcut = $Shell.CreateShortcut((Join-Path $Destination "$($Launcher.Name).lnk"))
+    $Shortcut.TargetPath = $env:ComSpec
+    $Shortcut.Arguments = "/d /c `"`"$StartLauncher`" $($Launcher.Arguments)`""
+    $Shortcut.WorkingDirectory = $ProjectRoot
+    $Shortcut.WindowStyle = 7
+    $Shortcut.Save()
+}
 
 $Modes = [ordered]@{
     "T&V - Wraparound" = "wraparound"

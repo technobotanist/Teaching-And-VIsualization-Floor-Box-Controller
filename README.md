@@ -20,6 +20,40 @@ See [Architecture](docs/ARCHITECTURE.md) and the [OBS scene contract](docs/OBS_S
 
 ## Install and preview
 
+### Windows: double-click to launch
+
+Keep the extracted repository in a permanent folder, then double-click
+**Start-Controller.cmd**. No terminal commands, Node.js, or React development server
+are needed: the Python server serves both the browser UI and API.
+
+On first launch, the launcher automatically installs Python 3.11 if a compatible
+Python 3.11-3.13 installation is not found, creates its local environment, installs
+the controller libraries, and creates desktop shortcuts. Initial setup needs an
+internet connection and Windows Package Manager (`winget`) if Python is missing.
+If automatic Python installation is unavailable, install Python 3.11-3.13 and
+double-click the launcher again. Windows may request approval during installation.
+
+After setup, use either desktop icon:
+
+- **T&V HDMI Floor Box Controller** starts the real OBS-connected controller.
+- **T&V Controller - Simulation** starts a preview without OBS or projectors.
+
+For a first-time preview, double-click **Start-Simulation.cmd** instead; it performs
+the same automatic setup. Both launchers start the server and open the browser.
+Desktop launches keep the server window minimized. Leave that window running;
+closing the browser does not stop the controller. To stop it, restore the server
+window and press **Ctrl+C**. Repeat launches reopen an already-running controller
+with the same configuration and simulation setting. Stop the existing server
+before switching between real and simulation mode, or after updating the code.
+
+OBS installation, OBS launch, and room commissioning are separate from controller
+setup; the launcher does not install or start OBS or enable physical outputs.
+Mode-specific desktop shortcuts require the controller to be running already.
+If you move the repository, double-click its launcher in the new location to
+refresh the desktop shortcuts automatically.
+
+### PowerShell alternative
+
 ```powershell
 .\scripts\Install.ps1
 .\scripts\Start-Controller.ps1 -Simulate

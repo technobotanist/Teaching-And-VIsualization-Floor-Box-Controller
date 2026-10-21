@@ -2,11 +2,23 @@
 
 ## Daily start
 
+On a new Windows machine, double-click `Start-Controller.cmd` in the repository
+folder once. It installs the controller dependencies, creates the desktop
+shortcuts, starts the local server, and opens the browser. For training without
+OBS, double-click `Start-Simulation.cmd` or the installed `T&V Controller - Simulation`
+desktop shortcut. See the [first-launch requirements](../README.md#install-and-preview).
+
 1. Power on the projectors and room workstation.
 2. Start OBS with Profile `T&V Display System` and Scene Collection `T&V Production`.
 3. Open the `T&V HDMI Floor Box Controller` desktop shortcut.
 4. Confirm the top-right status reads `OBS connected` and the commissioned count is correct.
 5. Select the required room mode.
+
+The controller shortcut starts both the local API and browser UI; no separate
+frontend server is needed. Its server window is minimized and must remain open.
+Launching the same controller again reopens the browser rather than starting a
+second server. To stop the controller or switch simulation settings, restore its
+server window and press **Ctrl+C** before launching again. OBS is started separately.
 
 ## Mode map
 
@@ -45,7 +57,8 @@ powershell.exe -NoProfile -ExecutionPolicy Bypass -File "C:\Path\To\Octave4505\s
 
 Replace `lecture-single` with `lecture-double`, `lecture-single-background`, `lecture-double-background`, `multi-source`, `wraparound`, `blank`, or `custom`. Artwork is in `assets/stream-deck`.
 
-Generate the Windows desktop shortcuts once with:
+First-time controller setup generates the Windows desktop shortcuts automatically.
+To regenerate them manually (for example after moving the repository), run:
 
 ```powershell
 .\scripts\Install-DesktopShortcuts.ps1

@@ -29,7 +29,7 @@ from .field_session import (
 from .field_report import build_field_report, render_field_report
 from .display_identifier import DisplayIdentifierError
 from .mode_exercise import ModeExerciseError, ModeExerciseRunner
-from .obs_gateway import ObsGateway, ObsGatewayError, ObsWebSocketGateway
+from .obs_gateway import ObsGateway, ObsGatewayError, ObsWebSocketGateway, SimulatedObsGateway
 from .obs_setup import ObsSetupError, ObsSetupService
 from .service import (
     ControllerStatus,
@@ -174,6 +174,14 @@ def create_app(
     @app.get("/health")
     def health() -> dict[str, str]:
         return {"status": "ok"}
+
+    @app.get("/api/v1/instance")
+    def instance() -> dict[str, object]:
+        return {
+            "application": "tv-display-controller",
+            "config_path": str(resolved_config_path.resolve()) if resolved_config_path else None,
+            "simulation": isinstance(obs_gateway, SimulatedObsGateway),
+        }
 
     @app.get("/api/v1/config")
     def public_config() -> dict[str, object]:

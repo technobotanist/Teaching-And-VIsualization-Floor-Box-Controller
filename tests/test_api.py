@@ -11,6 +11,23 @@ from tv_display_controller.obs_setup import ObsSetupService
 CONFIG_PATH = Path(__file__).parents[1] / "config" / "room.json"
 
 
+def test_instance_identifies_config_and_simulation(tmp_path: Path) -> None:
+    config_path = tmp_path / "room.json"
+    config_path.write_text(CONFIG_PATH.read_text(encoding="utf-8"), encoding="utf-8")
+    client = TestClient(create_app(
+        load_config(config_path), SimulatedObsGateway(), config_path
+    ))
+
+    response = client.get("/api/v1/instance")
+
+    assert response.status_code == 200
+    assert response.json() == {
+        "application": "tv-display-controller",
+        "config_path": str(config_path.resolve()),
+        "simulation": True,
+    }
+
+
 def test_config_endpoint_exposes_operator_data_only() -> None:
     config = load_config(CONFIG_PATH)
     client = TestClient(create_app(config, SimulatedObsGateway()))
