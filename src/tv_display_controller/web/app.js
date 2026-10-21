@@ -150,17 +150,24 @@ function renderStatus() {
 
   const totalOutputs = state.config?.outputs.projector_count || 8;
   const commissioned = state.status.commissioned_output_count;
+  const activeMode = state.config?.modes.find(
+    (mode) => mode.id === state.status.active_mode_id,
+  );
+  const activeLayout = activeMode?.label || "active layout";
   elements.outputCount.textContent = `${commissioned} of ${totalOutputs}`;
   elements.outputState.textContent = state.status.outputs_opened
-    ? "Outputs open"
+    ? `${activeLayout} full screen`
     : commissioned > 0
-      ? "Ready to open"
+      ? "Ready for full screen"
       : "Outputs locked";
 
   elements.openOutputs.disabled = state.busy || !connected || commissioned === 0;
+  elements.openOutputs.title = commissioned === 0
+    ? "Commission at least one projector display before presenting full screen"
+    : `Open ${activeLayout} full screen on the commissioned projector displays`;
   elements.openOutputs.textContent = state.status.outputs_opened
-    ? "Reopen projector outputs"
-    : "Open projector outputs";
+    ? `Reopen ${activeLayout} full screen`
+    : `Show ${activeLayout} full screen`;
 
   const customIsActive = state.status.active_mode_id === "custom";
   elements.customLiveState.textContent = customIsActive
@@ -338,7 +345,10 @@ async function openOutputs() {
   try {
     state.status = await request("/api/v1/outputs/open", { method: "POST" });
     renderStatus();
-    showToast("Projector output command sent");
+    const activeMode = state.config?.modes.find(
+      (mode) => mode.id === state.status.active_mode_id,
+    );
+    showToast(`${activeMode?.label || "Active layout"} is full screen on the projector outputs`);
   } catch (error) {
     showToast(error.message);
   } finally {

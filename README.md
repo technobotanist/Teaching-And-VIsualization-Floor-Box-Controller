@@ -38,6 +38,12 @@ After setup, use either desktop icon:
 - **T&V HDMI Floor Box Controller** starts the real OBS-connected controller.
 - **T&V Controller - Simulation** starts a preview without OBS or projectors.
 
+In the room controls, select a layout and use **Show [layout] full screen** to
+open the corresponding locked OBS outputs on all commissioned projector displays.
+For the one-source-per-projector layout, select **Multi-source**, then
+**Show Multi-source full screen**. This action remains disabled until projector
+monitor indexes are assigned and enabled during commissioning.
+
 For a first-time preview, double-click **Start-Simulation.cmd** instead; it performs
 the same automatic setup. Both launchers start the server and open the browser.
 Desktop launches keep the server window minimized. Leave that window running;

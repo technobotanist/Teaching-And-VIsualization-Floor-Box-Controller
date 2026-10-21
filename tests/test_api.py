@@ -180,8 +180,10 @@ def test_operator_interface_and_assets_are_served() -> None:
     assert "Projector assignment matrix" in page.text
     assert "OUT_P1" in page.text
     assert "Apply routing" in page.text
+    assert "Show active layout full screen" in page.text
     assert script.status_code == 200
     assert "applyCustomRouting" in script.text
+    assert "Show ${activeLayout} full screen" in script.text
     assert stylesheet.status_code == 200
     assert "--red: #cc0000" in stylesheet.text
 

@@ -13,12 +13,21 @@ desktop shortcut. See the [first-launch requirements](../README.md#install-and-p
 3. Open the `T&V HDMI Floor Box Controller` desktop shortcut.
 4. Confirm the top-right status reads `OBS connected` and the commissioned count is correct.
 5. Select the required room mode.
+6. Select **Show [layout] full screen** to open that layout on every commissioned
+   projector display. For all eight floor boxes, select **Multi-source**, then
+   **Show Multi-source full screen**.
 
 The controller shortcut starts both the local API and browser UI; no separate
 frontend server is needed. Its server window is minimized and must remain open.
 Launching the same controller again reopens the browser rather than starting a
 second server. To stop the controller or switch simulation settings, restore its
 server window and press **Ctrl+C** before launching again. OBS is started separately.
+
+The full-screen button opens the locked OBS `OUT_Pn` source-projector windows on
+their commissioned Windows displays. It is disabled until at least one projector
+has been assigned a monitor index and enabled in the Commissioning Console.
+The full-screen icon in the page header only expands the browser controller; it
+does not send video to the projector array.
 
 ## Mode map
 
